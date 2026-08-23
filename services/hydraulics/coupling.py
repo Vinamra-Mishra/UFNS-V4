@@ -301,7 +301,7 @@ class CoupledSpike:
                 led.D2S_m3 += d2s
 
                 # -- drive SWMM for the next stride ----------------------------
-                if ext_inflow_node == st1:
+                if ext_node == "ST1":
                     st1.generated_inflow(q_ex + external_inflow_m3s)
                 else:
                     st1.generated_inflow(q_ex)

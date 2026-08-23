@@ -40,6 +40,9 @@ def _failure_mode(exc: Exception) -> str:
     return f"{type(exc).__name__}: {exc}"
 
 
+MAX_ARTIFACT_BYTES: int = 250 * 1024 * 1024  # 250 MB
+
+
 def attempt_download(
     *,
     source_name: str,
@@ -48,15 +51,27 @@ def attempt_download(
     affected_gate: str,
     consequence: str,
     timeout_s: float = 20.0,
+    max_bytes: int = MAX_ARTIFACT_BYTES,
 ) -> AcquisitionAttempt:
     """Attempt one download; return the evidence record either way."""
-    dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_name(dest.name + ".tmp")
     try:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        total_written = 0
         with urlopen(url, timeout=timeout_s) as response:
-            body = response.read()
-        tmp.write_bytes(body)
+            with open(tmp, "wb") as f:
+                while True:
+                    chunk = response.read(64 * 1024)
+                    if not chunk:
+                        break
+                    total_written += len(chunk)
+                    if total_written > max_bytes:
+                        raise ValueError(
+                            f"download exceeded maximum allowed size of {max_bytes} bytes"
+                        )
+                    f.write(chunk)
         tmp.replace(dest)
+        artifact_bytes = dest.stat().st_size
         digest = sha256_file(dest)
     except Exception as exc:  # noqa: BLE001
         if tmp.exists():
@@ -80,7 +95,7 @@ def attempt_download(
         affected_gate=affected_gate,
         consequence="artifact downloaded; still requires validation before any VALIDATED claim",
         artifact_path=str(dest),
-        artifact_bytes=len(body),
+        artifact_bytes=artifact_bytes,
         artifact_sha256=digest,
     )
 

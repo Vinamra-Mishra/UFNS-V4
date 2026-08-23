@@ -36,6 +36,7 @@ IMPLEMENTED stages (map_drainage_entities):
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import math
@@ -1083,6 +1084,9 @@ def map_drainage_entities(
         "pipeline_version": PIPELINE_VERSION,
         "source_data_fingerprint": audit.source_fingerprint,
         "schema_fingerprint": audit.schema_fingerprint,
+        "source_dataset_name": config.source.dataset_name,
+        "expected_epsg": config.expected_epsg,
+        "supported_geometry_types": sorted(config.supported_geometry_types),
         "type_rules": [
             [k, getattr(config.type_rules[k], "value", str(config.type_rules[k]))]
             for k in sorted(config.type_rules)
