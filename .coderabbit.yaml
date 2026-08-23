@@ -6,6 +6,10 @@ reviews:
   poem: true
   review_status: true
   review_details: false
+  path_filters:
+    - "!**/*.tif"
+    - "!**/*.png"
+    - "!data/demo/**"
   auto_review:
     enabled: true
     drafts: false
