@@ -165,6 +165,10 @@
           <option value="avoid_impassable">Avoid impassable</option>
         </select>
       </div>
+      <div class="row" style="margin-bottom:6px">
+        <input type="text" id="inp-origin" placeholder="Orig X,Y" class="btn ghost" style="width:110px">
+        <input type="text" id="inp-dest" placeholder="Dest X,Y" class="btn ghost" style="width:110px">
+      </div>
       <div id="route-panel" class="muted">Pick an origin and a destination on the map.</div>
     </div>
 
@@ -515,13 +519,18 @@ async function preloadProjection(id){
   await Promise.all(proms);
 }
 
+let _leadReq = 0;
 async function setLead(lead, force){
   state.lead = clampLead(lead);
   updateLeadControl();
   const activeId = isProjectionMode() ? state.projectionConfig : state.scenario;
+  const token = ++_leadReq;
   try {
-    frame = await loadFrame(activeId, state.lead, force);
+    const res = await loadFrame(activeId, state.lead, force);
+    if (token !== _leadReq) return;
+    frame = res;
   } catch (e) {
+    if (token !== _leadReq) return;
     // Only 503 + PROJECTION_UNAVAILABLE is the documented "unavailable" state;
     // other 503s are infrastructure failures and must surface as errors.
     if (isProjectionMode() && e.statusCode === 503 && e.errorCode === "PROJECTION_UNAVAILABLE") {
@@ -535,9 +544,11 @@ async function setLead(lead, force){
     }
     throw e;
   }
+  if (token !== _leadReq) return;
   depthCanvas = buildDepthCanvas(frame);
   extentCanvas = buildExtentCanvas(frame);
   if (state.layers.rainfall) await loadRain(activeId, state.lead);
+  if (token !== _leadReq) return;
   renderMetrics();
   renderInsights();
   renderRoadPanel();
@@ -770,6 +781,8 @@ async function computeRoute(){
   renderRoutePanel(); renderInsights(); draw();
 }
 function renderRoutePanel(){
+  if (state.origin) $("inp-origin").value = state.origin.map(x=>x.toFixed(2)).join(",");
+  if (state.dest) $("inp-dest").value = state.dest.map(x=>x.toFixed(2)).join(",");
   const box = $("route-panel");
   const sel = (state.tool==="origin"||state.tool==="dest");
   box.innerHTML = `<div class="row">
@@ -882,6 +895,26 @@ canvas.addEventListener("click", (e)=>{
   if (state.tool === "dest"){ state.dest=[wx,wy]; state.tool="select"; updateToolButtons(); renderRoutePanel(); computeRoute(); draw(); return; }
   const rid = hitRoad(wx,wy);
   if (rid) selectRoad(rid); else { state.selectedRoad=null; state.selectedRoadTimeline=null; renderRoadPanel(); draw(); }
+});
+
+function _parsePoint(str){
+  if (typeof str !== "string") return null;
+  const parts = str.trim().split(",");
+  if (parts.length !== 2) return null;
+  const s0 = parts[0].trim(), s1 = parts[1].trim();
+  if (!s0 || !s1) return null;
+  const x = Number(s0), y = Number(s1);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (x < 300000 || x > 304020 || y < 2500000 || y > 2504020) return null;
+  return [x, y];
+}
+$("inp-origin").addEventListener("change", (e)=>{
+  const p = _parsePoint(e.target.value);
+  if (p) { state.origin=p; renderRoutePanel(); computeRoute(); draw(); }
+});
+$("inp-dest").addEventListener("change", (e)=>{
+  const p = _parsePoint(e.target.value);
+  if (p) { state.dest=p; renderRoutePanel(); computeRoute(); draw(); }
 });
 function hitRoad(wx,wy){
   let best=null, bestD=1e9;

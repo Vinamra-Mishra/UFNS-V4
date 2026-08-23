@@ -36,6 +36,7 @@ IMPLEMENTED stages (map_drainage_entities):
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import math
@@ -466,8 +467,23 @@ def _read_geoparquet(
     source_path: Path,
 ) -> tuple[Any, str | None, str | None, list[str]]:
     """Read a (Geo)Parquet file: (df, geometry_column, crs_wkt, notes)."""
+    p = Path(source_path).resolve()
+    try:
+        stat = p.stat()
+        file_version = (stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        file_version = (0, 0)
+    return _read_geoparquet_cached(str(p), file_version)
+
+
+@functools.lru_cache(maxsize=4)
+def _read_geoparquet_cached(
+    source_path_str: str,
+    file_version: tuple[int, int],
+) -> tuple[Any, str | None, str | None, list[str]]:
     import pyarrow.parquet as pq
 
+    source_path = Path(source_path_str)
     notes: list[str] = []
     table = pq.read_table(source_path)
     schema_meta = table.schema.metadata or {}
@@ -485,7 +501,8 @@ def _read_geoparquet(
     crs_wkt: str | None = None
     if geom_col is not None:
         col_meta = geo_meta.get("columns", {}).get(geom_col, {})
-        crs_wkt = col_meta.get("crs")
+        crs = col_meta.get("crs")
+        crs_wkt = crs if isinstance(crs, str) else json.dumps(crs, sort_keys=True) if crs else None
     if geom_col is None:
         for candidate in ("geometry", "geom", "wkb_geometry"):
             if candidate in df.columns:
@@ -1067,7 +1084,13 @@ def map_drainage_entities(
         "pipeline_version": PIPELINE_VERSION,
         "source_data_fingerprint": audit.source_fingerprint,
         "schema_fingerprint": audit.schema_fingerprint,
-        "type_rules": sorted(config.type_rules),
+        "source_dataset_name": config.source.dataset_name,
+        "expected_epsg": config.expected_epsg,
+        "supported_geometry_types": sorted(config.supported_geometry_types),
+        "type_rules": [
+            [k, getattr(config.type_rules[k], "value", str(config.type_rules[k]))]
+            for k in sorted(config.type_rules)
+        ],
         "hydraulic_rules": [
             [r.column, r.target, r.scale, r.derivation] for r in config.hydraulic_rules
         ],

@@ -119,6 +119,8 @@ class RainfallGrid(BaseModel):
     def _check_interval(self) -> "RainfallGrid":
         if self.valid_to <= self.valid_from:
             raise ValueError("valid_to must be strictly after valid_from")
+        if self.valid_from.tzinfo is None or self.valid_to.tzinfo is None or self.issue_time.tzinfo is None:
+            raise ValueError("timestamps must be timezone-aware")
         if self.confidence is not None and not (0.0 <= self.confidence <= 1.0):
             raise ValueError("confidence must be in [0, 1]")
         return self
@@ -147,10 +149,13 @@ class RainfallProfile(BaseModel):
     @field_validator("intensities_mmh")
     @classmethod
     def _nonnegative(cls, v: list[float]) -> list[float]:
-        if any(x < 0 for x in v):
-            raise ValueError("rainfall intensities must be non-negative")
+        import math
         if not all(isinstance(x, (int, float)) for x in v):
             raise ValueError("intensities must be numeric")
+        if any(not math.isfinite(x) for x in v):
+            raise ValueError("rainfall intensities must be finite")
+        if any(x < 0 for x in v):
+            raise ValueError("rainfall intensities must be non-negative")
         return v
 
 

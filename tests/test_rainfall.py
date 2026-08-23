@@ -58,9 +58,19 @@ def test_alternating_block_totals_and_peak_placement():
     assert len(hyeto) == 12
     total = sum(h * (15 / 60) for h in hyeto)
     assert total == pytest.approx(45.0, rel=1e-9)
-    # alternating block: the largest increment sits at (or adjacent to) mid-storm
-    mid = 12 // 2
-    assert max(hyeto) in (hyeto[mid], hyeto[mid - 1], hyeto[mid + 1])
+    # The highest intensity should be near the middle
+    assert np.argmax(hyeto) in (5, 6)
+
+
+def test_alternating_block_ordering():
+    # A concave curve with standard parameters should yield
+    # adjacent blocks monotonically decreasing away from peak
+    hyeto = alternating_block_hyetograph(total_mm=45.0, duration_min=180, interval_min=15)
+    peak_idx = np.argmax(hyeto)
+    # Check left side is monotonically increasing
+    assert np.all(np.diff(hyeto[:peak_idx + 1]) > -1e-9)
+    # Check right side is monotonically decreasing
+    assert np.all(np.diff(hyeto[peak_idx:]) < 1e-9)
 
 
 def test_profile_review_status_provisional():

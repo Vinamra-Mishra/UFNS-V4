@@ -220,6 +220,10 @@ class CoupledSpike:
             except Exception as e:
                 raise CouplingError(f"required SWMM object missing in {self.inp_path}: {e}") from e
             try:
+                ext_inflow_node = Nodes(sim)[ext_node]
+            except Exception as e:
+                raise CouplingError(f"external inflow node {ext_node!r} missing in {self.inp_path}: {e}") from e
+            try:
                 vent = Nodes(sim)["V1"]   # exact-exchange fixture (storage vent)
             except Exception:
                 vent = Nodes(sim)["J1"]   # flooding demo fixture (junction vent)
@@ -237,7 +241,9 @@ class CoupledSpike:
             prev_d2s_rate = 0.0
             prev_ext_rate = 0.0  # external inflow active during the completed stride
             rain_ms = rain_mmh / 3600000.0
+            last_i = -1
             for i, _ in enumerate(sim):
+                last_i = i
                 if i >= n_steps + 1:
                     break
                 t = (i + 1) * dt  # SWMM state is at t_{i+1} after stride i
@@ -295,7 +301,11 @@ class CoupledSpike:
                 led.D2S_m3 += d2s
 
                 # -- drive SWMM for the next stride ----------------------------
-                st1.generated_inflow(q_ex + external_inflow_m3s)
+                if ext_node == "ST1":
+                    st1.generated_inflow(q_ex + external_inflow_m3s)
+                else:
+                    st1.generated_inflow(q_ex)
+                    ext_inflow_node.generated_inflow(external_inflow_m3s)
                 led.ext_in_m3 += external_inflow_m3s * dt
                 prev_s2d_rate = s2d / dt
                 prev_d2s_rate = d2s / dt
@@ -307,6 +317,9 @@ class CoupledSpike:
                 )
                 if not math.isfinite(s2d) or not math.isfinite(d2s):
                     raise CouplingError("non-finite exchange volume")
+
+            if last_i < n_steps:
+                raise CouplingError(f"SWMM simulation ended prematurely at stride {last_i}, expected at least {n_steps}")
 
             led.flow_routing_error_pct = float(sim.flow_routing_error)
             led.S_s1 = self.surface.surface_storage_m3()

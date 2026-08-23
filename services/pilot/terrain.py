@@ -133,14 +133,34 @@ class RealTerrainAdapter:
             )
 
         grid = result.grid
-        # CRS provenance: the real DEM (GeoTIFF) embeds EPSG:4326 (verified by
-        # M10 ingest_dem). Modelling CRS is the pilot grid CRS (EPSG:32645).
+        src_crs_prov = getattr(result.provenance, "crs_source", None)
+        if src_crs_prov is not None:
+            source_crs = src_crs_prov.source_crs
+            prov_status = src_crs_prov.provenance_status
+            embedded_crs = src_crs_prov.embedded_crs
+            authority = src_crs_prov.authority
+        elif result.provenance and getattr(result.provenance, "native_crs", None):
+            source_crs = result.provenance.native_crs
+            prov_status = CRSProvenanceStatus.EMBEDDED.value
+            embedded_crs = source_crs
+            authority = getattr(result.provenance, "source_name", "Source file metadata")
+        elif result.output_crs:
+            source_crs = result.output_crs
+            prov_status = CRSProvenanceStatus.EMBEDDED.value
+            embedded_crs = result.output_crs
+            authority = "Source file raster metadata"
+        else:
+            source_crs = "ABSENT"
+            prov_status = CRSProvenanceStatus.UNRESOLVED.value
+            embedded_crs = "ABSENT"
+            authority = ""
+
         crs_source = CRSSourceProvenance(
-            source_crs="EPSG:4326",
+            source_crs=source_crs,
             modelling_crs=grid.crs_wkt_or_epsg,
-            embedded_crs="EPSG:4326",
-            provenance_status=CRSProvenanceStatus.EMBEDDED.value,
-            authority="Copernicus DEM GLO-30 GeoTIFF metadata",
+            embedded_crs=embedded_crs,
+            provenance_status=prov_status,
+            authority=authority,
         )
         raw_sha = sha256_file(path)
         return RealTerrain(
@@ -152,10 +172,10 @@ class RealTerrainAdapter:
             resampling=result.resampling,
             raw_dem_path=Path(path),
             raw_dem_sha256=raw_sha,
-            source_crs="EPSG:4326",
+            source_crs=source_crs,
             modelling_crs=grid.crs_wkt_or_epsg,
-            embedded_crs="EPSG:4326",
-            crs_provenance_status=CRSProvenanceStatus.EMBEDDED.value,
+            embedded_crs=embedded_crs,
+            crs_provenance_status=prov_status,
             processing_fingerprint=result.processing_fingerprint,
             vertical_reference="REAL_DEM_VERTICAL_DATUM_UNVERIFIED",
             normalization_status=result.status.value,

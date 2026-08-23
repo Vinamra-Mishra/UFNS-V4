@@ -158,12 +158,13 @@ def _surface_fingerprint() -> str:
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
 
 
-def _scenario_fingerprint(scenario_id: str, profile_id: str,
+def _scenario_fingerprint(scenario_id: str, profile_id: str, profile_fp: str,
                           drainage_id: str, surface_fp: str,
                           swmm_fp: str) -> str:
     payload = {
         "scenario_id": scenario_id,
         "rainfall_profile": profile_id,
+        "rainfall_profile_fingerprint": profile_fp,
         "drainage_condition": drainage_id,
         "surface_config": surface_fp,
         "swmm_fixture": swmm_fp,
@@ -254,7 +255,7 @@ def _build_scenarios() -> dict[str, ScenarioRecord]:
 
     out: dict[str, ScenarioRecord] = {}
     for sid, name, desc, profile, drain, assumption in scenarios:
-        fp = _scenario_fingerprint(sid, profile.profile_id, drain.condition_id,
+        fp = _scenario_fingerprint(sid, profile.profile_id, profile.fingerprint, drain.condition_id,
                                    surface_fp, drain.inp_fingerprint)
         out[sid] = ScenarioRecord(
             scenario_id=sid,

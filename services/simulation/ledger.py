@@ -87,7 +87,13 @@ class MassLedger:
             status = "fail"
             rel = None
         else:
-            scale = max(abs(self.rainfall_input_m3) + abs(self.external_inflow_m3), ABS_SCALE_M3)
+            scale = max(
+                abs(self.rainfall_input_m3)
+                + abs(self.external_inflow_m3)
+                + abs(self.surface_storage_initial_m3)
+                + abs(self.drain_storage_initial_m3),
+                ABS_SCALE_M3
+            )
             rel = abs(residual) / scale
             if rel <= PASS_REL or (abs(residual) <= ABS_SCALE_M3 and self.rainfall_input_m3 == 0):
                 status = "pass"

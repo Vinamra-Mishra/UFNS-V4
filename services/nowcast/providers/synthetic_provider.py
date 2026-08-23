@@ -54,6 +54,8 @@ class SyntheticRainfallProvider(RainfallProvider):
         spatial_reference: str = "EPSG:32645",
         spatial_resolution_m: float = 30.0,
     ) -> None:
+        if temporal_resolution_minutes <= 0:
+            raise ValueError("temporal_resolution_minutes must be > 0")
         self._provider_id = provider_id
         self._base_rate_mmh = base_rate_mmh
         self._pattern = pattern

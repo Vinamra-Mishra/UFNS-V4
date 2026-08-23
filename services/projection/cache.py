@@ -17,8 +17,13 @@ class _CacheEntry(Generic[T]):
 class ProjectionCache:
     """Thread-safe TTL cache for expensive M9 projection bundles."""
 
-    def __init__(self, ttl_seconds: int = 300) -> None:
+    def __init__(self, ttl_seconds: int = 300, max_size: int = 100) -> None:
+        if max_size <= 0:
+            raise ValueError(f"max_size must be positive, got {max_size}")
+        if ttl_seconds <= 0:
+            raise ValueError(f"ttl_seconds must be positive, got {ttl_seconds}")
         self._ttl_seconds = ttl_seconds
+        self._max_size = max_size
         self._lock = threading.RLock()
         self._entries: dict[str, _CacheEntry[Any]] = {}
 
@@ -38,7 +43,16 @@ class ProjectionCache:
 
     def put(self, key: str, value: Any) -> str:
         with self._lock:
-            self._entries[key] = _CacheEntry(value=value, cached_at=datetime.now(timezone.utc))
+            now = datetime.now(timezone.utc)
+            expired_keys = [k for k, v in self._entries.items() if self._expired(v.cached_at, now)]
+            for k in expired_keys:
+                del self._entries[k]
+            
+            self._entries[key] = _CacheEntry(value=value, cached_at=now)
+            
+            while len(self._entries) > self._max_size:
+                oldest_key = next(iter(self._entries))
+                del self._entries[oldest_key]
         return key
 
     def clear(self) -> None:

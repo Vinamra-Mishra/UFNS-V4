@@ -335,13 +335,12 @@ class RealPilotSimulationResult:
     def capability_state(self) -> PilotCapabilityState:
         return PilotCapabilityState(
             real_terrain_available=True,
-            real_geometry_available=True,
+            real_geometry_available=False,
             hydraulic_parameters_present=False,
             hydraulic_network_ready=False,
             reason=(
-                "Real terrain + real drainage geometry available; hydraulic "
-                "parameters MISSING (synthetic fixture used). "
-                "HYDRAULIC_NETWORK_READY=False."
+                "Real terrain available; real drainage geometry MISSING or UNUSED "
+                "(synthetic fixture used). HYDRAULIC_NETWORK_READY=False."
             ),
         )
 

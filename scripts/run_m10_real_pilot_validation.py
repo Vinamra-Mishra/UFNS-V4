@@ -42,7 +42,9 @@ DRAINS_PATH = DATA_RAW / "WB_AMRUT_Stormwater_drains.parquet"
 VENTS_PATH = DATA_RAW / "WB_AMRUT_Stormwater_vents.parquet"
 
 
-def _wgs_overlap(a: tuple[float, float, float, float], b: tuple[float, float, float, float]) -> bool:
+def _wgs_overlap(a: tuple[float, ...], b: tuple[float, ...]) -> bool:
+    if not a or not b or len(a) < 4 or len(b) < 4:
+        return False
     return min(a[2], b[2]) - max(a[0], b[0]) > 0 and min(a[3], b[3]) - max(a[1], b[1]) > 0
 
 
@@ -108,7 +110,7 @@ def main() -> int:
     }
 
     report = {
-        "executed_at_utc": dem_norm.provenance.acquisition_timestamp.isoformat(),
+        "executed_at_utc": dem_norm.provenance.acquisition_timestamp.isoformat() if dem_norm.provenance.acquisition_timestamp else None,
         "artifacts": {
             "dem": {"path": str(DEM_PATH.relative_to(ROOT))},
             "drains": {"path": str(DRAINS_PATH.relative_to(ROOT))},

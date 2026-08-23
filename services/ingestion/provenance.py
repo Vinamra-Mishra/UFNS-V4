@@ -76,19 +76,21 @@ class Manifest:
             uri = str(path.relative_to(self.base_dir))
         else:
             uri = str(path)
-        self.assets.append(
-            {
-                "role": role,
-                "asset_uri": uri,
-                "content_sha256": lineage.content_sha256,
-                "provenance_class": lineage.provenance_class.value,
-                "quality_flags": [f.value for f in lineage.quality_flags],
-                "licence_id": lineage.licence_id,
-                "native_crs": lineage.native_crs,
-                "native_resolution": lineage.native_resolution,
-                **(extra or {}),
-            }
-        )
+        base = {
+            "role": role,
+            "asset_uri": uri,
+            "content_sha256": lineage.content_sha256,
+            "provenance_class": lineage.provenance_class.value,
+            "quality_flags": [f.value for f in lineage.quality_flags],
+            "licence_id": lineage.licence_id,
+            "native_crs": lineage.native_crs,
+            "native_resolution": lineage.native_resolution,
+        }
+        if extra:
+            for k, v in extra.items():
+                if k not in base:
+                    base[k] = v
+        self.assets.append(base)
 
     def write(self, out_path: Path, extra: Optional[dict[str, Any]] = None, created_at: Optional[datetime] = None) -> Path:
         from services.ingestion.timeutil import iso_utc
@@ -99,8 +101,11 @@ class Manifest:
             "created_at": iso_utc(created_at or datetime.now(timezone.utc)),
             "interchange_crs": "OGC:CRS84",
             "assets": self.assets,
-            **(extra or {}),
         }
+        if extra:
+            for k, v in extra.items():
+                if k not in doc:
+                    doc[k] = v
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(json.dumps(doc, indent=2, sort_keys=True))
+        out_path.write_text(json.dumps(doc, indent=2))
         return out_path

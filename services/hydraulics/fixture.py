@@ -70,7 +70,10 @@ C1_CAPACITY = full_bore_capacity(C1_DIAMETER, C1_SLOPE, C1_MANNING)
 C1_BLOCKED_CAPACITY = full_bore_capacity(C1_DIAMETER / 2, C1_SLOPE, C1_MANNING)
 
 
+FIXTURE_SPAN_HOURS = 6.0  # (SYNTHETIC: duration of the fixed SWMM simulation clock)
+
 def _options() -> str:
+    # 06:00:00 matches FIXTURE_SPAN_HOURS
     return """[OPTIONS]
 FLOW_UNITS           CMS
 FLOW_ROUTING         DYNWAVE

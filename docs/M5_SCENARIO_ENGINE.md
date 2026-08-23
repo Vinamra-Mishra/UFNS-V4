@@ -357,18 +357,10 @@ The following human reviews are required or already recorded:
 | M2 surface-adapter accounting (residual outflow, film bound, clamp) | Recorded as closed in M4 review; re-affirmed here | `docs/AI_REVIEW.md` |
 | M3 coupling semantics and M3-09 conservation | Recorded as closed | `docs/M3_SWMM_COUPLING.md` |
 | M4 coupled model acceptance | **PASS** (2026-08-21) | `docs/M4_COUPLED_MODEL.md`; 81/81 tests |
-| M4 visual review (DEM, rain, clean/blocked flood, difference, timelines) | **Recorded as SATISFACTORY** (2026-08-21) | See §20 below |
+| M4 visual review (DEM, rain, clean/blocked flood, difference, timelines) | **UNSUPPORTED / REMOVED** | — |
 | D-016 hyetograph approval | **PENDING** | This doc §18; profiles labelled PROVISIONAL |
 | B02 WB AMRUT drainage-data audit | Open (partial audit recorded) | `docs/DATA_AUDIT_WB_AMRUT.md` |
 | Vehicle passability thresholds (B13) | Deferred to M7 | — |
-
-**M4 visual review record (required by M5 spec §1):**
-
-- **Reviewer:** UFNS Hydrologist / Engineering Reviewer (agent-verified structural inspection + human visual sign-off acknowledged in M4 spec §30)
-- **Review date:** 2026-08-21
-- **Artifacts reviewed:** `data/demo/m4/m4_dem.png`, `m4_rain_peak.png`, `m4_flood_clean_peak.png`, `m4_flood_blocked_peak.png`, `m4_diff_blocked_clean.png`, `m4_depth_timeline.png`, `m4_drainage_state.png`, `m4_summary.json`, plus the per-snapshot GeoTIFFs in `clean/` and `blocked/`.
-- **Finding:** Dem shows the expected synthetic NW→SE sloping terrain with central depression; rainfall pattern shows advecting convective cell; clean flood peak is hydrologically consistent with 45 mm/3 h; blocked scenario shows visibly increased ponding and ST1 surcharge; difference map localises excess water near the vent cell; timelines show expected rise-peak-recession shape; drainage-state timeline shows D2S spill onset and outfall suppression. All artifacts carry SYNTHETIC/SIMULATED/PROVISIONAL labels. No visual artefact suggests a solver instability or mass-accounting breakdown.
-- **Remaining limitations:** Visuals are 30 m resolution, not street-scale; DEM and network are synthetic; rainfall is PROVISIONAL pending D-016; no observed imagery exists for direct comparison.
 
 ## 20. Acceptance Decision
 

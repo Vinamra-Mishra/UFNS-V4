@@ -41,10 +41,12 @@ class DrainageStatus(str, Enum):
 # this value for M4 result comparability).
 BLOCKED_DIAMETER_M = 0.12
 
+ROOT = Path(__file__).resolve().parents[2]
+
 # The M4 fixtures are pre-written in data/demo/. We verify they match the
 # expected content fingerprint.
-_CLEAN_INP = Path("data/demo/drainage_synthetic_m4.inp")
-_BLOCKED_INP = Path("data/demo/drainage_synthetic_m4_blocked.inp")
+_CLEAN_INP = ROOT / "data/demo/drainage_synthetic_m4.inp"
+_BLOCKED_INP = ROOT / "data/demo/drainage_synthetic_m4_blocked.inp"
 
 
 def _sha256_text(s: str) -> str:
@@ -109,7 +111,19 @@ def _build_conditions() -> dict[str, DrainageCondition]:
         if _sha256_text(on_disk_clean) != _sha256_text(clean_inp_text):
             # The on-disk file may differ in whitespace/formatting only —
             # compare by content fingerprint instead of literal bytes.
-            pass  # we use file-hash fingerprint; content re-derivation is for info.
+            raise RuntimeError(
+                f"SWMM fixture mismatch: {_CLEAN_INP.name} content SHA-256 does not match "
+                "the programmatic generator. Re-run scripts/build_synthetic_fixtures.py "
+                "or fix the file."
+            )
+    if _BLOCKED_INP.exists():
+        on_disk_blocked = _BLOCKED_INP.read_text()
+        if _sha256_text(on_disk_blocked) != _sha256_text(blocked_inp_text):
+            raise RuntimeError(
+                f"SWMM fixture mismatch: {_BLOCKED_INP.name} content SHA-256 does not match "
+                "the programmatic generator. Re-run scripts/build_synthetic_fixtures.py "
+                "or fix the file."
+            )
 
     q_clean = full_bore_capacity(C1_DIAMETER, C1_SLOPE, C1_MANNING)
     q_blocked = full_bore_capacity(BLOCKED_DIAMETER_M, C1_SLOPE, C1_MANNING)

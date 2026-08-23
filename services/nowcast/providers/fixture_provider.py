@@ -59,6 +59,10 @@ class FixtureRainfallProvider(RainfallProvider):
         spatial_resolution_m: float = 30.0,
         scenario_label: str = "FIXTURE_SCENARIO",
     ) -> None:
+        if not profile_intensities_mmh:
+            raise ValueError("profile_intensities_mmh must not be empty")
+        if interval_minutes <= 0:
+            raise ValueError("interval_minutes must be > 0")
         self._provider_id = provider_id
         self._intensities = tuple(profile_intensities_mmh)
         self._interval_minutes = interval_minutes

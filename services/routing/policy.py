@@ -70,6 +70,8 @@ BASELINE_SPEED_KMH: dict[str, float] = {
 CLASS_ORDER = ("DRY", "LOW_IMPACT", "CAUTION", "HIGH_IMPACT", "IMPASSABLE")
 
 
+from types import MappingProxyType
+
 @dataclass(frozen=True)
 class PassabilityPolicy:
     """The active passability policy (frozen, versioned, fingerprinted)."""
@@ -77,12 +79,44 @@ class PassabilityPolicy:
     policy_id: str
     status: str
     version: int
-    thresholds: dict[str, float]
+    thresholds: MappingProxyType[str, float]
     impacted_depth_threshold_m: float
-    speed_factors: dict[str, float]
-    baseline_speed_kmh: dict[str, float]
+    speed_factors: MappingProxyType[str, float]
+    baseline_speed_kmh: MappingProxyType[str, float]
     disclaimer: str
     fingerprint: str
+
+    def __init__(self, policy_id: str, status: str, version: int, thresholds: dict[str, float], impacted_depth_threshold_m: float, speed_factors: dict[str, float], baseline_speed_kmh: dict[str, float], disclaimer: str):
+        object.__setattr__(self, "policy_id", policy_id)
+        object.__setattr__(self, "status", status)
+        object.__setattr__(self, "version", version)
+        
+        sealed_thresholds = MappingProxyType(dict(thresholds))
+        object.__setattr__(self, "thresholds", sealed_thresholds)
+        
+        object.__setattr__(self, "impacted_depth_threshold_m", impacted_depth_threshold_m)
+        
+        sealed_speed = MappingProxyType(dict(speed_factors))
+        object.__setattr__(self, "speed_factors", sealed_speed)
+        
+        sealed_base = MappingProxyType(dict(baseline_speed_kmh))
+        object.__setattr__(self, "baseline_speed_kmh", sealed_base)
+        
+        object.__setattr__(self, "disclaimer", disclaimer)
+        
+        payload = {
+            "policy_id": policy_id,
+            "status": status,
+            "version": version,
+            "thresholds": dict(sealed_thresholds),
+            "impacted_depth_threshold_m": impacted_depth_threshold_m,
+            "speed_factors": dict(sealed_speed),
+            "baseline_speed_kmh": dict(sealed_base),
+            "class_order": CLASS_ORDER,
+        }
+        canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        fp = hashlib.sha256(canon.encode("utf-8")).hexdigest()
+        object.__setattr__(self, "fingerprint", fp)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -105,32 +139,15 @@ DISCLAIMER = (
     "severity bands, not expert-approved or universal public-safety limits."
 )
 
-
-def _policy_fingerprint() -> str:
-    payload = {
-        "policy_id": POLICY_ID,
-        "status": POLICY_STATUS,
-        "version": POLICY_VERSION,
-        "thresholds": THRESHOLDS,
-        "impacted_depth_threshold_m": IMPACTED_DEPTH_THRESHOLD_M,
-        "speed_factors": SPEED_FACTORS,
-        "baseline_speed_kmh": BASELINE_SPEED_KMH,
-        "class_order": CLASS_ORDER,
-    }
-    canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canon.encode("utf-8")).hexdigest()
-
-
 POLICY = PassabilityPolicy(
     policy_id=POLICY_ID,
     status=POLICY_STATUS,
     version=POLICY_VERSION,
-    thresholds=dict(THRESHOLDS),
+    thresholds=THRESHOLDS,
     impacted_depth_threshold_m=IMPACTED_DEPTH_THRESHOLD_M,
-    speed_factors=dict(SPEED_FACTORS),
-    baseline_speed_kmh=dict(BASELINE_SPEED_KMH),
+    speed_factors=SPEED_FACTORS,
+    baseline_speed_kmh=BASELINE_SPEED_KMH,
     disclaimer=DISCLAIMER,
-    fingerprint=_policy_fingerprint(),
 )
 
 
