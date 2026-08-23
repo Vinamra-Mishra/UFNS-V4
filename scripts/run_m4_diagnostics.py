@@ -99,7 +99,7 @@ def main() -> None:
         }
         print(f"  {key}: peak={res.peak_depth_m:.3f}m area={res.max_flooded_area_m2/1e6:.3f}km2 "
               f"S2D={led.S2D_m3:.1f} D2S={led.D2S_m3:.1f} outfall={led.outfall_m3:.1f} "
-              f"resid={led.relative_total():.2e if led.rain_m3 + led.ext_in_m3 > 0 else 0:.2e} "
+              f"resid={(led.relative_total() if led.rain_m3 + led.ext_in_m3 > 0 else 0):.2e} "
               f"{res.mass_balance.status} ({res.wall_seconds:.1f}s)")
 
     # -- static previews --------------------------------------------------------
