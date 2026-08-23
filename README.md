@@ -11,6 +11,14 @@ UFNS is a reproducible, student-scale prototype that couples rainfall forcing, t
 
 It is described honestly as **neighbourhood-scale flood screening**, not curb-scale hydraulics.
 
+## Codebase Statistics
+
+- **Real Code Base (SLOC)**: **20,855 source lines of code** (26,021 total lines across 103 `.py` and `.html` source files; excluding documentation markdown, JSON/YAML configs, and data fixtures).
+  - `services/`: 10,307 SLOC (59 files)
+  - `apps/`: 2,574 SLOC (10 files)
+  - `scripts/`: 1,111 SLOC (8 files)
+  - `tests/`: 6,863 SLOC (26 files)
+
 ## Documents
 
 - [Implementation master specification](docs/IMPLEMENTATION_SPEC.md) — human-approved baseline (M1–M12)
