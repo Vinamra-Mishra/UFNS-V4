@@ -184,11 +184,15 @@ class RunConfig:
             n = self.duration_minutes // self.rainfall.interval_minutes
             if len(self.rainfall.intensities_mmh) != n:
                 raise CouplingError(f"profile needs {n} intensities, got {len(self.rainfall.intensities_mmh)}")
-            if any(v < 0 for v in self.rainfall.intensities_mmh):
-                raise CouplingError("rainfall intensities must be non-negative")
+            if any(not math.isfinite(v) or v < 0 for v in self.rainfall.intensities_mmh):
+                raise CouplingError("rainfall intensities must be finite and non-negative")
         elif self.rainfall.kind in ("uniform", "spatial"):
-            if len(self.rainfall.intensities_mmh) != 1 or self.rainfall.intensities_mmh[0] < 0:
-                raise CouplingError("uniform/spatial rainfall needs one non-negative intensity")
+            if (
+                len(self.rainfall.intensities_mmh) != 1
+                or not math.isfinite(self.rainfall.intensities_mmh[0])
+                or self.rainfall.intensities_mmh[0] < 0
+            ):
+                raise CouplingError("uniform/spatial rainfall needs one finite, non-negative intensity")
         elif self.rainfall.kind == "explicit_fields":
             n = self.duration_minutes // self.rainfall.interval_minutes
             fields = self.rainfall.explicit_fields_mmh

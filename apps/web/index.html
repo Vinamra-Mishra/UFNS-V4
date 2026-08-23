@@ -526,7 +526,9 @@ async function setLead(lead, force){
   const activeId = isProjectionMode() ? state.projectionConfig : state.scenario;
   const token = ++_leadReq;
   try {
-    frame = await loadFrame(activeId, state.lead, force);
+    const res = await loadFrame(activeId, state.lead, force);
+    if (token !== _leadReq) return;
+    frame = res;
   } catch (e) {
     if (token !== _leadReq) return;
     // Only 503 + PROJECTION_UNAVAILABLE is the documented "unavailable" state;
@@ -896,10 +898,15 @@ canvas.addEventListener("click", (e)=>{
 });
 
 function _parsePoint(str){
-  const parts = str.split(",");
-  if (parts.length!==2) return null;
-  const x=parseFloat(parts[0]), y=parseFloat(parts[1]);
-  return (isNaN(x)||isNaN(y)) ? null : [x,y];
+  if (typeof str !== "string") return null;
+  const parts = str.trim().split(",");
+  if (parts.length !== 2) return null;
+  const s0 = parts[0].trim(), s1 = parts[1].trim();
+  if (!s0 || !s1) return null;
+  const x = Number(s0), y = Number(s1);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (x < 300000 || x > 304020 || y < 2500000 || y > 2504020) return null;
+  return [x, y];
 }
 $("inp-origin").addEventListener("change", (e)=>{
   const p = _parsePoint(e.target.value);

@@ -116,6 +116,14 @@ def _build_conditions() -> dict[str, DrainageCondition]:
                 "the programmatic generator. Re-run scripts/build_synthetic_fixtures.py "
                 "or fix the file."
             )
+    if _BLOCKED_INP.exists():
+        on_disk_blocked = _BLOCKED_INP.read_text()
+        if _sha256_text(on_disk_blocked) != _sha256_text(blocked_inp_text):
+            raise RuntimeError(
+                f"SWMM fixture mismatch: {_BLOCKED_INP.name} content SHA-256 does not match "
+                "the programmatic generator. Re-run scripts/build_synthetic_fixtures.py "
+                "or fix the file."
+            )
 
     q_clean = full_bore_capacity(C1_DIAMETER, C1_SLOPE, C1_MANNING)
     q_blocked = full_bore_capacity(BLOCKED_DIAMETER_M, C1_SLOPE, C1_MANNING)

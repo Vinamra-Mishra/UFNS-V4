@@ -51,10 +51,19 @@ def attempt_download(
 ) -> AcquisitionAttempt:
     """Attempt one download; return the evidence record either way."""
     dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(dest.name + ".tmp")
     try:
         with urlopen(url, timeout=timeout_s) as response:
             body = response.read()
+        tmp.write_bytes(body)
+        tmp.replace(dest)
+        digest = sha256_file(dest)
     except Exception as exc:  # noqa: BLE001
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
         return AcquisitionAttempt(
             source_name=source_name,
             url=url,
@@ -64,9 +73,6 @@ def attempt_download(
             consequence=consequence,
         )
 
-    tmp = dest.with_name(dest.name + ".tmp")
-    tmp.write_bytes(body)
-    tmp.replace(dest)
     return AcquisitionAttempt(
         source_name=source_name,
         url=url,
@@ -75,7 +81,7 @@ def attempt_download(
         consequence="artifact downloaded; still requires validation before any VALIDATED claim",
         artifact_path=str(dest),
         artifact_bytes=len(body),
-        artifact_sha256=sha256_file(dest),
+        artifact_sha256=digest,
     )
 
 

@@ -772,11 +772,25 @@ async def _http_exception_handler(request, exc: HTTPException):
 
 
 from fastapi.exceptions import RequestValidationError
+
+
 @app.exception_handler(RequestValidationError)
 async def _validation_error_handler(request, exc: RequestValidationError):
+    safe_details = []
+    for err in exc.errors():
+        safe_details.append({
+            "loc": list(err.get("loc", ())),
+            "type": str(err.get("type", "value_error")),
+        })
     return JSONResponse(
         status_code=422,
-        content={"error": {"code": "VALIDATION_ERROR", "message": str(exc)}},
+        content={
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Request validation failed",
+                "details": safe_details,
+            }
+        },
     )
 
 

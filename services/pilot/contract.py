@@ -151,19 +151,47 @@ def build_real_drainage_contract(
             a for a in REQUIRED_HYDRAULIC_ATTRIBUTES
             if a not in unresolved and a not in derived and a not in present
         )
+
+    req_set = set(REQUIRED_HYDRAULIC_ATTRIBUTES)
+    all_supplied = present + derived + unresolved + missing
+    for attr in all_supplied:
+        if attr not in req_set:
+            raise ValueError(f"unknown hydraulic attribute {attr!r}")
+
+    seen: dict[str, str] = {}
+    for bucket_name, bucket in (
+        ("present", present),
+        ("derived", derived),
+        ("unresolved", unresolved),
+        ("missing", missing),
+    ):
+        for attr in bucket:
+            if attr in seen:
+                raise ValueError(
+                    f"attribute {attr!r} classified in multiple buckets: {seen[attr]!r} and {bucket_name!r}"
+                )
+            seen[attr] = bucket_name
+
+    if set(seen.keys()) != req_set:
+        unassigned = req_set - set(seen.keys())
+        raise ValueError(
+            f"incomplete hydraulic attribute partition; unassigned attributes: {sorted(unassigned)}"
+        )
+
     status: dict[str, AttributeReadiness] = {}
     for name in REQUIRED_HYDRAULIC_ATTRIBUTES:
-        if name in present:
+        bucket = seen[name]
+        if bucket == "present":
             status[name] = AttributeReadiness(
                 name, HydraulicAvailability.PRESENT, source="real_source",
                 basis="present and unambiguous in real source",
             )
-        elif name in derived:
+        elif bucket == "derived":
             status[name] = AttributeReadiness(
                 name, HydraulicAvailability.DERIVED, source="real_source",
                 basis="derived from an unambiguous real source column by a governed rule",
             )
-        elif name in unresolved:
+        elif bucket == "unresolved":
             status[name] = AttributeReadiness(
                 name, HydraulicAvailability.UNRESOLVED, source="real_source",
                 basis="candidate column present but units/semantics unverifiable; not converted",
@@ -173,12 +201,6 @@ def build_real_drainage_contract(
                 name, HydraulicAvailability.MISSING, source="absent",
                 basis="confirmed absent from real source; not invented",
             )
-
-    # Sanity: an attribute may only appear in one bucket.
-    seen = present + derived + unresolved + missing
-    for name in REQUIRED_HYDRAULIC_ATTRIBUTES:
-        if seen.count(name) > 1:  # pragma: no cover - defensive
-            raise ValueError(f"attribute {name!r} classified in multiple buckets")
 
     ready = len(missing) == 0 and len(unresolved) == 0 and len(present) + len(derived) == len(
         REQUIRED_HYDRAULIC_ATTRIBUTES

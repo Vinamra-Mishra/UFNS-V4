@@ -56,6 +56,14 @@ def alternating_block_hyetograph(total_mm: float, duration_min: int, interval_mi
     largest increment is placed at mid-storm and the rest alternate outward.
     Returns per-interval intensities in mm/h.
     """
+    if duration_min <= 0:
+        raise ValueError(f"duration_min must be positive, got {duration_min}")
+    if interval_min <= 0:
+        raise ValueError(f"interval_min must be positive, got {interval_min}")
+    if duration_min % interval_min != 0:
+        raise ValueError(
+            f"duration_min ({duration_min}) must be exactly divisible by interval_min ({interval_min})"
+        )
     n = duration_min // interval_min
     if n < 2:
         raise ValueError("duration must cover at least two intervals")

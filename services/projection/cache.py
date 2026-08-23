@@ -18,6 +18,10 @@ class ProjectionCache:
     """Thread-safe TTL cache for expensive M9 projection bundles."""
 
     def __init__(self, ttl_seconds: int = 300, max_size: int = 100) -> None:
+        if max_size <= 0:
+            raise ValueError(f"max_size must be positive, got {max_size}")
+        if ttl_seconds <= 0:
+            raise ValueError(f"ttl_seconds must be positive, got {ttl_seconds}")
         self._ttl_seconds = ttl_seconds
         self._max_size = max_size
         self._lock = threading.RLock()

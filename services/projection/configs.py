@@ -51,6 +51,7 @@ class ProjectionConfigRecord:
     def __post_init__(self) -> None:
         payload = {
             "config_id": self.config_id,
+            "base_scenarios": list(self.base_scenarios),
             "drainage_condition": self.drainage_condition.condition_id,
             "drainage_fingerprint": self.drainage_condition.inp_fingerprint,
             "duration_minutes": self.duration_minutes,

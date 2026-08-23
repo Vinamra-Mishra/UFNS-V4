@@ -43,7 +43,7 @@ VENTS_PATH = DATA_RAW / "WB_AMRUT_Stormwater_vents.parquet"
 
 
 def _wgs_overlap(a: tuple[float, ...], b: tuple[float, ...]) -> bool:
-    if not a or not b:
+    if not a or not b or len(a) < 4 or len(b) < 4:
         return False
     return min(a[2], b[2]) - max(a[0], b[0]) > 0 and min(a[3], b[3]) - max(a[1], b[1]) > 0
 
