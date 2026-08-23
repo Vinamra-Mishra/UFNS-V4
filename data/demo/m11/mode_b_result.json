@@ -1,0 +1,275 @@
+{
+  "adapter_version": "m11-real-pilot-adapter-v1",
+  "capability_state": {
+    "hydraulic_network_ready": false,
+    "hydraulic_parameters_present": false,
+    "real_geometry_available": true,
+    "real_terrain_available": true,
+    "reason": "Real terrain + real drainage geometry available; hydraulic parameters MISSING (synthetic fixture used). HYDRAULIC_NETWORK_READY=False."
+  },
+  "cell_map": {
+    "basin_cell": [
+      124,
+      28
+    ],
+    "basin_elevation_m": 3.4035,
+    "basis": "Deterministic mapping on REAL ROI terrain: lowest interior cell = basin; inlets = nearest ranked basin-shoulder cells above the floor; vent = nearby raised cell. Datum offset anchors the SYNTHETIC SWMM fixture to the real basin floor (documented alignment, not a fabricated hydraulic parameter).",
+    "datum_offset_m": -6.5965,
+    "inlet_cells": [
+      [
+        121,
+        30
+      ],
+      [
+        128,
+        28
+      ],
+      [
+        129,
+        28
+      ],
+      [
+        130,
+        27
+      ],
+      [
+        130,
+        28
+      ],
+      [
+        131,
+        27
+      ],
+      [
+        130,
+        20
+      ],
+      [
+        127,
+        20
+      ],
+      [
+        112,
+        12
+      ],
+      [
+        111,
+        12
+      ],
+      [
+        108,
+        14
+      ],
+      [
+        132,
+        12
+      ]
+    ],
+    "labels": [
+      "REAL_TERRAIN_MAPPING",
+      "PROVISIONAL"
+    ],
+    "vent_cell": [
+      124,
+      31
+    ]
+  },
+  "config_fingerprint": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+  "content_label": "REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+  "engine_version": "m4-coupling-v1",
+  "hydraulic_contract": {
+    "assumed_attributes": [
+      "diameter_m",
+      "invert_upstream_m",
+      "invert_downstream_m",
+      "manning_n",
+      "capacity_m3s"
+    ],
+    "attributes": {
+      "capacity_m3s": {
+        "availability": "ASSUMED",
+        "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+        "name": "capacity_m3s",
+        "source": "synthetic_fixture"
+      },
+      "diameter_m": {
+        "availability": "ASSUMED",
+        "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+        "name": "diameter_m",
+        "source": "synthetic_fixture"
+      },
+      "invert_downstream_m": {
+        "availability": "ASSUMED",
+        "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+        "name": "invert_downstream_m",
+        "source": "synthetic_fixture"
+      },
+      "invert_upstream_m": {
+        "availability": "ASSUMED",
+        "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+        "name": "invert_upstream_m",
+        "source": "synthetic_fixture"
+      },
+      "manning_n": {
+        "availability": "ASSUMED",
+        "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+        "name": "manning_n",
+        "source": "synthetic_fixture"
+      }
+    },
+    "dataset": "M4_synthetic_exact_exchange_fixture",
+    "derived_attributes": [],
+    "hydraulic_network_ready": false,
+    "missing_attributes": [],
+    "notes": "Synthetic/assumed hydraulic fixture explicitly labelled; the real hydraulic network remains NOT ready. Values are NEVER REAL_DATA.",
+    "present_attributes": [],
+    "real_hydraulic_network_ready": false,
+    "required_attributes": [
+      "diameter_m",
+      "invert_upstream_m",
+      "invert_downstream_m",
+      "manning_n",
+      "capacity_m3s"
+    ],
+    "synthetic_fixture_labelled": true,
+    "unresolved_attributes": []
+  },
+  "labels": [
+    "REAL_TERRAIN",
+    "SYNTHETIC_HYDRAULICS",
+    "REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+    "PROVISIONAL",
+    "NOT_REAL_TIME",
+    "NOT_VALIDATED_FORECAST"
+  ],
+  "limitations": [
+    "MODE B uses REAL terrain (real ROI elevations from the real DEM) with an explicitly-labelled SYNTHETIC hydraulic fixture.",
+    "Hydraulic parameters (diameter, invert, Manning, capacity) are SYNTHETIC/ASSUMED \u2014 they are NOT real and NOT validated against the pilot drainage network.",
+    "Vertical datum of the real DEM is UNVERIFIED; the synthetic fixture datum is anchored to the real ROI basin for coupling only.",
+    "Rainfall is PROVISIONAL (D-016 PREPARED, human review REQUIRED); NOT real-time, NOT a validated forecast.",
+    "ROI is a zero-nodata sub-rectangle of the authoritative pilot grid; full-pilot normalization remains authoritative (M11-01)."
+  ],
+  "mass_balance": {
+    "drainage_outfall_m3": 64.97463642195498,
+    "external_inflow_m3": 0.0,
+    "final_drain_storage_m3": 7.157082746101531,
+    "final_surface_storage_m3": 213063.82442406996,
+    "infiltration_loss_m3": 69148.528943617,
+    "initial_drain_storage_m3": 0.0,
+    "initial_surface_storage_m3": 15.681600000000001,
+    "interval_end": "2026-08-23T00:15:00Z",
+    "interval_start": "2026-08-23T00:00:00Z",
+    "rainfall_input_m3": 313631.97898864746,
+    "relative_error": 7.811132693635298e-08,
+    "residual_m3": -0.02449821004847763,
+    "status": "pass",
+    "surface_boundary_outflow_m3": 2.490651240805164e-09
+  },
+  "mass_ledger": {
+    "D2S_m3": 0.0,
+    "S2D_m3": 72.1317191680565,
+    "combined_residual_m3": -0.02449821004847763,
+    "drainage_outfall_m3": 64.97463642195498,
+    "external_inflow_m3": 0.0,
+    "infiltration_loss_m3": 69148.528943617,
+    "microstore_final_m3": 31363.2,
+    "rainfall_input_m3": 313631.97898864746,
+    "relative_residual": 7.811132693635298e-08,
+    "status": "pass",
+    "surface_boundary_outflow_m3": 2.490651240805164e-09,
+    "swmm_flood_export_m3": 0.0,
+    "swmm_flow_routing_error_pct": 0.0
+  },
+  "model_mode": "MODE_B_REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+  "provenance": {
+    "crs_source": {
+      "authority": "Copernicus DEM GLO-30 GeoTIFF metadata",
+      "embedded_crs": "EPSG:4326",
+      "modelling_crs": "EPSG:32645",
+      "provenance_status": "EMBEDDED",
+      "source_crs": "EPSG:4326"
+    },
+    "drainage_mapping_fingerprint": "",
+    "extra": {
+      "pilot_gridspec_fingerprint": "e5fb98909f544cb44fe31132101019a9d3e418598c532039744bf22e79c63e80"
+    },
+    "gridspec_fingerprint": "0813216d474b6c59c746b25f67d6bf95873472618d2a1fb54ddb7cdd648214ff",
+    "model_config_fingerprint": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+    "model_mode": "MODE_B_REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+    "normalized_dem_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1",
+    "rainfall_fingerprint": "b5b76d98d6346141",
+    "raw_dem_path": "/home/user/UFNS/data/raw/bagjola_kolkata_glo30_dem.tif",
+    "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+    "raw_drainage_path": "",
+    "raw_drainage_sha256": "",
+    "scenario_fingerprint": "e5fb98909f544cb44fe31132101019a9d3e418598c532039744bf22e79c63e80",
+    "software_version": "m11-real-pilot-adapter-v1+m4-coupling-v1",
+    "status_labels": [
+      "REAL_TERRAIN",
+      "SYNTHETIC_HYDRAULICS",
+      "PROVISIONAL",
+      "NOT_REAL_TIME",
+      "NOT_VALIDATED_FORECAST"
+    ]
+  },
+  "rainfall_status": {
+    "d016_human_review": "REQUIRED",
+    "d016_status": "PREPARED",
+    "profile_status": "PROVISIONAL",
+    "rainfall_fingerprint": "b5b76d98d6346141",
+    "real_time": false,
+    "validated_forecast": false
+  },
+  "roi": {
+    "col0": 50,
+    "grid": {
+      "affine_transform": [
+        30.0,
+        0.0,
+        665880.0,
+        0.0,
+        -30.0,
+        2532150.0
+      ],
+      "bounds": [
+        665880.0,
+        2528130.0,
+        669900.0,
+        2532150.0
+      ],
+      "cell_size_m": 30.0,
+      "crs_wkt_or_epsg": "EPSG:32645",
+      "grid_id": "ufns_pilot_grid_real_roi_50_50_134",
+      "height": 134,
+      "nodata": null,
+      "vertical_crs": null,
+      "width": 134
+    },
+    "labels": [
+      "REAL_DATA",
+      "REAL_TERRAIN",
+      "PROVISIONAL"
+    ],
+    "origin_xy": [
+      665880.0,
+      2532150.0
+    ],
+    "pilot_grid_id": "ufns_pilot_grid_real",
+    "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+    "row0": 50,
+    "window_cells": [
+      134,
+      134
+    ]
+  },
+  "run_id": "m11_modeB_20260823T000000Z",
+  "scenario_id": "M11_MODE_B",
+  "sim_summary": {
+    "max_flooded_area_m2": 1006200.0,
+    "max_st1_head_m": 3.635661812675173,
+    "n_coupling_steps": 180,
+    "peak_depth_m": 0.3767609015329841,
+    "time_to_peak_min": 15.0,
+    "wall_seconds": 2.6537727179998
+  }
+}

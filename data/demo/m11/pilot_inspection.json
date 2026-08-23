@@ -1,0 +1,148 @@
+{
+  "dem_provenance": {
+    "modelling_crs": "EPSG:32645",
+    "nodata_cells": 9404,
+    "normalization_status": "NORMALIZED",
+    "processing_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1",
+    "raw_dem_path": "/home/user/UFNS/data/raw/bagjola_kolkata_glo30_dem.tif",
+    "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+    "source_crs": "EPSG:4326",
+    "total_cells": 790164,
+    "vertical_reference": "REAL_DEM_VERTICAL_DATUM_UNVERIFIED"
+  },
+  "drainage_coverage": {
+    "crs_provenance": {
+      "authority": "MoHUA / TCPO / NRSC AMRUT GIS Design & Standards",
+      "embedded_crs": "ABSENT",
+      "modelling_crs": "EPSG:32645",
+      "provenance_status": "AUTHORITATIVE_EXTERNAL_PROVENANCE",
+      "source_crs": "EPSG:4326"
+    },
+    "embedded_crs": "ABSENT",
+    "mapped_count": 0,
+    "modelling_crs": "EPSG:32645",
+    "raw_drains_path": "/home/user/UFNS/data/raw/WB_AMRUT_Stormwater_drains.parquet",
+    "rejected_count": 4576,
+    "rejection_breakdown": {
+      "REJECTED_DUPLICATE": 4574,
+      "REJECTED_INVALID_GEOMETRY": 2
+    },
+    "source_crs": "EPSG:4326",
+    "total_source_features": 90395,
+    "unresolved_count": 85819
+  },
+  "generated_at": "2026-08-23T03:14:33.728027+00:00",
+  "gridspec": {
+    "affine_transform": [
+      30.0,
+      0.0,
+      664380.0,
+      0.0,
+      -30.0,
+      2533650.0
+    ],
+    "bounds": [
+      664380.0,
+      2505630.0,
+      689760.0,
+      2533650.0
+    ],
+    "cell_size_m": 30.0,
+    "crs_wkt_or_epsg": "EPSG:32645",
+    "grid_id": "ufns_pilot_grid_real",
+    "height": 934,
+    "nodata": null,
+    "vertical_crs": null,
+    "width": 846
+  },
+  "gridspec_fingerprint": "e5fb98909f544cb44fe31132101019a9d3e418598c532039744bf22e79c63e80",
+  "hydraulic_readiness": {
+    "assumed_attributes": [],
+    "attributes": {
+      "capacity_m3s": {
+        "availability": "MISSING",
+        "basis": "confirmed absent from real source; not invented",
+        "name": "capacity_m3s",
+        "source": "absent"
+      },
+      "diameter_m": {
+        "availability": "MISSING",
+        "basis": "confirmed absent from real source; not invented",
+        "name": "diameter_m",
+        "source": "absent"
+      },
+      "invert_downstream_m": {
+        "availability": "MISSING",
+        "basis": "confirmed absent from real source; not invented",
+        "name": "invert_downstream_m",
+        "source": "absent"
+      },
+      "invert_upstream_m": {
+        "availability": "MISSING",
+        "basis": "confirmed absent from real source; not invented",
+        "name": "invert_upstream_m",
+        "source": "absent"
+      },
+      "manning_n": {
+        "availability": "MISSING",
+        "basis": "confirmed absent from real source; not invented",
+        "name": "manning_n",
+        "source": "absent"
+      }
+    },
+    "dataset": "WB_AMRUT_Stormwater_drains",
+    "derived_attributes": [],
+    "hydraulic_network_ready": false,
+    "missing_attributes": [
+      "diameter_m",
+      "invert_upstream_m",
+      "invert_downstream_m",
+      "manning_n",
+      "capacity_m3s"
+    ],
+    "notes": "Real WB AMRUT geometry integrated; required hydraulic attributes are MISSING \u2014 a real hydraulic drainage network is NOT ready.",
+    "present_attributes": [],
+    "real_hydraulic_network_ready": false,
+    "required_attributes": [
+      "diameter_m",
+      "invert_upstream_m",
+      "invert_downstream_m",
+      "manning_n",
+      "capacity_m3s"
+    ],
+    "synthetic_fixture_labelled": false,
+    "unresolved_attributes": []
+  },
+  "labels": [
+    "REAL_PILOT",
+    "REAL_TERRAIN",
+    "SYNTHETIC_HYDRAULICS",
+    "PROVISIONAL",
+    "MISSING_HYDRAULICS",
+    "NOT_REAL_TIME",
+    "NOT_VALIDATED_FORECAST"
+  ],
+  "model_mode_executed": "MODE_B_REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+  "model_modes": {
+    "MODE_A": "REAL_TERRAIN / REAL_DRAINAGE_GEOMETRY (no hydraulic sim; geometry only)",
+    "MODE_B": "REAL_TERRAIN / SYNTHETIC_HYDRAULICS (executable; ran for inspection)",
+    "MODE_C": "SYNTHETIC_BASELINE (M1-M9 regression path)"
+  },
+  "not_for_operational_use": true,
+  "overall_gate": "PASS",
+  "rainfall_status": {
+    "d016_human_review": "REQUIRED",
+    "d016_status": "PREPARED",
+    "profile_status": "PROVISIONAL",
+    "rainfall_fingerprint": "b5b76d98d6346141",
+    "real_time": false,
+    "validated_forecast": false
+  },
+  "simulation_availability": {
+    "hydraulic_network_ready": false,
+    "mass_relative_residual": 7.811132693635298e-08,
+    "mass_status": "pass",
+    "mode_b_executed": true,
+    "mode_b_run_id": "m11_modeB_20260823T000000Z"
+  }
+}

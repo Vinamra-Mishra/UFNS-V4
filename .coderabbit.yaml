@@ -1,0 +1,6 @@
+version: "2"
+reviews:
+  path_filters:
+    - "!**/*.tif"
+    - "!**/*.png"
+    - "!data/demo/**"

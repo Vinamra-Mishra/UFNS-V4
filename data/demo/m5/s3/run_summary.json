@@ -1,0 +1,37 @@
+{
+  "fingerprint": "b0cd64f0a188c8b19af0e662a77d7b68ec7455633fc6bcd134424b37585a1bee",
+  "labels": [
+    "SYNTHETIC",
+    "SIMULATED",
+    "PROVISIONAL"
+  ],
+  "mass_balance": {
+    "drainage_outfall_m3": 847.7397093658324,
+    "external_inflow_m3": 0.0,
+    "final_drain_storage_m3": 10.768875593961404,
+    "final_surface_storage_m3": 705002.8686981358,
+    "infiltration_loss_m3": 247647.3163519363,
+    "initial_drain_storage_m3": 0.0,
+    "initial_surface_storage_m3": 15.681600000000001,
+    "interval_end": "2026-08-21T03:00:00Z",
+    "interval_start": "2026-08-21T00:00:00Z",
+    "rainfall_input_m3": 1070918.6475276947,
+    "relative_error": 0.00020602629658425452,
+    "residual_m3": -220.63740289314956,
+    "status": "pass",
+    "surface_boundary_outflow_m3": 86283.07289555582
+  },
+  "metrics": {
+    "max_flooded_area_m2": 4576500.0,
+    "max_st1_head_m": 20.502215034040688,
+    "peak_depth_m": 0.6144834690330546,
+    "peak_rss_mb": 320.33984375,
+    "time_to_peak_min": 110.0,
+    "total_D2S_m3": 0.0,
+    "total_S2D_m3": 858.5085849597932,
+    "total_outfall_m3": 847.7397093658324,
+    "wall_seconds": 20.091513338999903
+  },
+  "run_id": "m5_S3_20260821T000000Z",
+  "scenario_id": "S3"
+}

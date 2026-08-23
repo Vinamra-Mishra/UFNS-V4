@@ -1,0 +1,407 @@
+{
+  "gates": {
+    "M11-01": {
+      "evidence": {
+        "grid_id": "ufns_pilot_grid_real",
+        "nodata_cells": 9404,
+        "normalization_status": "NORMALIZED",
+        "processing_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1",
+        "provenance_answers": {
+          "gridspec": {
+            "affine_transform": [
+              30.0,
+              0.0,
+              664380.0,
+              0.0,
+              -30.0,
+              2533650.0
+            ],
+            "bounds": [
+              664380.0,
+              2505630.0,
+              689760.0,
+              2533650.0
+            ],
+            "cell_size_m": 30.0,
+            "crs_wkt_or_epsg": "EPSG:32645",
+            "grid_id": "ufns_pilot_grid_real",
+            "height": 934,
+            "nodata": null,
+            "vertical_crs": null,
+            "width": 846
+          },
+          "modelling_crs": "EPSG:32645",
+          "nodata_present": true,
+          "processing_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1",
+          "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+          "raw_dem_used": "/home/user/UFNS/data/raw/bagjola_kolkata_glo30_dem.tif",
+          "resampling": "bilinear",
+          "source_crs": "EPSG:4326"
+        },
+        "shape": [
+          934,
+          846
+        ]
+      },
+      "name": "Real DEM model-ready",
+      "status": "PASS"
+    },
+    "M11-02": {
+      "evidence": {
+        "crs_source": {
+          "authority": "MoHUA / TCPO / NRSC AMRUT GIS Design & Standards",
+          "embedded_crs": "ABSENT",
+          "modelling_crs": "EPSG:32645",
+          "provenance_status": "AUTHORITATIVE_EXTERNAL_PROVENANCE",
+          "source_crs": "EPSG:4326"
+        },
+        "entities_reprojected": 85819,
+        "modelling_crs": "EPSG:32645",
+        "processing_fingerprint": "dad0b26d8150801e27551c1069ed4959ac5e026630cb12b0dd4b4dffada75d7f",
+        "source_crs": "EPSG:4326"
+      },
+      "name": "Real drainage spatially aligned",
+      "status": "PASS"
+    },
+    "M11-03": {
+      "evidence": {
+        "accounted_for": 90395,
+        "mapping_stats": {
+          "mapped": 0,
+          "rejected": 4576,
+          "unresolved_type": 85819
+        },
+        "rejection_breakdown": {
+          "REJECTED_DUPLICATE": 4574,
+          "REJECTED_INVALID_GEOMETRY": 2
+        },
+        "total_source_features": 90395,
+        "traceable_fields": [
+          "feature_id",
+          "source_id",
+          "source_type",
+          "mapping_status"
+        ]
+      },
+      "name": "Entity provenance complete",
+      "status": "PASS"
+    },
+    "M11-04": {
+      "evidence": {
+        "assumed_attributes": [],
+        "attributes": {
+          "capacity_m3s": {
+            "availability": "MISSING",
+            "basis": "confirmed absent from real source; not invented",
+            "name": "capacity_m3s",
+            "source": "absent"
+          },
+          "diameter_m": {
+            "availability": "MISSING",
+            "basis": "confirmed absent from real source; not invented",
+            "name": "diameter_m",
+            "source": "absent"
+          },
+          "invert_downstream_m": {
+            "availability": "MISSING",
+            "basis": "confirmed absent from real source; not invented",
+            "name": "invert_downstream_m",
+            "source": "absent"
+          },
+          "invert_upstream_m": {
+            "availability": "MISSING",
+            "basis": "confirmed absent from real source; not invented",
+            "name": "invert_upstream_m",
+            "source": "absent"
+          },
+          "manning_n": {
+            "availability": "MISSING",
+            "basis": "confirmed absent from real source; not invented",
+            "name": "manning_n",
+            "source": "absent"
+          }
+        },
+        "dataset": "WB_AMRUT_Stormwater_drains",
+        "derived_attributes": [],
+        "hydraulic_network_ready": false,
+        "missing_attributes": [
+          "diameter_m",
+          "invert_upstream_m",
+          "invert_downstream_m",
+          "manning_n",
+          "capacity_m3s"
+        ],
+        "notes": "Real WB AMRUT geometry integrated; required hydraulic attributes are MISSING \u2014 a real hydraulic drainage network is NOT ready.",
+        "present_attributes": [],
+        "real_hydraulic_network_ready": false,
+        "required_attributes": [
+          "diameter_m",
+          "invert_upstream_m",
+          "invert_downstream_m",
+          "manning_n",
+          "capacity_m3s"
+        ],
+        "synthetic_fixture_labelled": false,
+        "unresolved_attributes": []
+      },
+      "name": "Hydraulic readiness explicitly governed",
+      "status": "PASS"
+    },
+    "M11-05": {
+      "evidence": {
+        "mode_b_content_label": "REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+        "synthetic_contract": {
+          "assumed_attributes": [
+            "diameter_m",
+            "invert_upstream_m",
+            "invert_downstream_m",
+            "manning_n",
+            "capacity_m3s"
+          ],
+          "attributes": {
+            "capacity_m3s": {
+              "availability": "ASSUMED",
+              "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+              "name": "capacity_m3s",
+              "source": "synthetic_fixture"
+            },
+            "diameter_m": {
+              "availability": "ASSUMED",
+              "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+              "name": "diameter_m",
+              "source": "synthetic_fixture"
+            },
+            "invert_downstream_m": {
+              "availability": "ASSUMED",
+              "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+              "name": "invert_downstream_m",
+              "source": "synthetic_fixture"
+            },
+            "invert_upstream_m": {
+              "availability": "ASSUMED",
+              "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+              "name": "invert_upstream_m",
+              "source": "synthetic_fixture"
+            },
+            "manning_n": {
+              "availability": "ASSUMED",
+              "basis": "explicitly labelled SYNTHETIC/ASSUMED fixture value; not real",
+              "name": "manning_n",
+              "source": "synthetic_fixture"
+            }
+          },
+          "dataset": "M4_synthetic_exact_exchange_fixture",
+          "derived_attributes": [],
+          "hydraulic_network_ready": false,
+          "missing_attributes": [],
+          "notes": "Synthetic/assumed hydraulic fixture explicitly labelled; the real hydraulic network remains NOT ready. Values are NEVER REAL_DATA.",
+          "present_attributes": [],
+          "real_hydraulic_network_ready": false,
+          "required_attributes": [
+            "diameter_m",
+            "invert_upstream_m",
+            "invert_downstream_m",
+            "manning_n",
+            "capacity_m3s"
+          ],
+          "synthetic_fixture_labelled": true,
+          "unresolved_attributes": []
+        },
+        "terrain_labels": [
+          "REAL_DATA",
+          "PROVISIONAL",
+          "REAL_TERRAIN"
+        ]
+      },
+      "name": "Real/synthetic separation",
+      "status": "PASS"
+    },
+    "M11-06": {
+      "evidence": {
+        "S2D_m3": 72.1317191680565,
+        "config_fingerprint": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+        "content_label": "REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+        "outfall_m3": 64.97463642195498,
+        "roi": {
+          "col0": 50,
+          "grid": {
+            "affine_transform": [
+              30.0,
+              0.0,
+              665880.0,
+              0.0,
+              -30.0,
+              2532150.0
+            ],
+            "bounds": [
+              665880.0,
+              2528130.0,
+              669900.0,
+              2532150.0
+            ],
+            "cell_size_m": 30.0,
+            "crs_wkt_or_epsg": "EPSG:32645",
+            "grid_id": "ufns_pilot_grid_real_roi_50_50_134",
+            "height": 134,
+            "nodata": null,
+            "vertical_crs": null,
+            "width": 134
+          },
+          "labels": [
+            "REAL_DATA",
+            "REAL_TERRAIN",
+            "PROVISIONAL"
+          ],
+          "origin_xy": [
+            665880.0,
+            2532150.0
+          ],
+          "pilot_grid_id": "ufns_pilot_grid_real",
+          "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+          "row0": 50,
+          "window_cells": [
+            134,
+            134
+          ]
+        },
+        "run_id": "m11_modeB_20260823T000000Z"
+      },
+      "name": "Real-pilot simulation path",
+      "status": "PASS"
+    },
+    "M11-07": {
+      "evidence": {
+        "combined_residual_m3": -0.02449821004847763,
+        "mass_balance": {
+          "drainage_outfall_m3": 64.97463642195498,
+          "external_inflow_m3": 0.0,
+          "final_drain_storage_m3": 7.157082746101531,
+          "final_surface_storage_m3": 213063.82442406996,
+          "infiltration_loss_m3": 69148.528943617,
+          "initial_drain_storage_m3": 0.0,
+          "initial_surface_storage_m3": 15.681600000000001,
+          "interval_end": "2026-08-23T00:15:00Z",
+          "interval_start": "2026-08-23T00:00:00Z",
+          "rainfall_input_m3": 313631.97898864746,
+          "relative_error": 7.811132693635298e-08,
+          "residual_m3": -0.02449821004847763,
+          "status": "pass",
+          "surface_boundary_outflow_m3": 2.490651240805164e-09
+        },
+        "relative_residual": 7.811132693635298e-08,
+        "status": "pass",
+        "swmm_flow_routing_error_pct": 0.0,
+        "tolerance_rel": 0.01
+      },
+      "name": "Mass conservation",
+      "status": "PASS"
+    },
+    "M11-08": {
+      "evidence": {
+        "config_fingerprint_run1": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+        "config_fingerprint_run2": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+        "depth_arrays_bit_identical": true,
+        "processing_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1"
+      },
+      "name": "Determinism",
+      "status": "PASS"
+    },
+    "M11-09": {
+      "evidence": {
+        "crs_source": {
+          "authority": "Copernicus DEM GLO-30 GeoTIFF metadata",
+          "embedded_crs": "EPSG:4326",
+          "modelling_crs": "EPSG:32645",
+          "provenance_status": "EMBEDDED",
+          "source_crs": "EPSG:4326"
+        },
+        "drainage_mapping_fingerprint": "",
+        "extra": {
+          "pilot_gridspec_fingerprint": "e5fb98909f544cb44fe31132101019a9d3e418598c532039744bf22e79c63e80"
+        },
+        "gridspec_fingerprint": "0813216d474b6c59c746b25f67d6bf95873472618d2a1fb54ddb7cdd648214ff",
+        "model_config_fingerprint": "cdfd90f9bb1b0c3a08845dd9ec04f65c64a90964aaa5bd86be334ce65417896b",
+        "model_mode": "MODE_B_REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+        "normalized_dem_fingerprint": "9b7ab55554f19d5a64d9fafa7d47319ef1fa3d2affec1b10f340acaf7a0e64e1",
+        "rainfall_fingerprint": "b5b76d98d6346141",
+        "raw_dem_path": "/home/user/UFNS/data/raw/bagjola_kolkata_glo30_dem.tif",
+        "raw_dem_sha256": "8832ae955ec8b8dbdab5a9bc4047852c17f6343c598514bc6092c38717dcc96a",
+        "raw_drainage_path": "",
+        "raw_drainage_sha256": "",
+        "scenario_fingerprint": "e5fb98909f544cb44fe31132101019a9d3e418598c532039744bf22e79c63e80",
+        "software_version": "m11-real-pilot-adapter-v1+m4-coupling-v1",
+        "status_labels": [
+          "REAL_TERRAIN",
+          "SYNTHETIC_HYDRAULICS",
+          "PROVISIONAL",
+          "NOT_REAL_TIME",
+          "NOT_VALIDATED_FORECAST"
+        ]
+      },
+      "name": "Provenance completeness",
+      "status": "PASS"
+    },
+    "M11-10": {
+      "evidence": {
+        "pilot_grid_id": "ufns_pilot_grid_real",
+        "synthetic_dem_shape": [
+          134,
+          134
+        ],
+        "synthetic_inp_present": true,
+        "synthetic_origin": [
+          300000.0,
+          2500000.0
+        ]
+      },
+      "name": "M1-M9 regression",
+      "status": "PASS"
+    },
+    "M11-11": {
+      "evidence": {
+        "entity_hydraulic_fields_present": [],
+        "missing_attributes": [
+          "diameter_m",
+          "invert_upstream_m",
+          "invert_downstream_m",
+          "manning_n",
+          "capacity_m3s"
+        ]
+      },
+      "name": "No fabricated hydraulic values",
+      "status": "PASS"
+    },
+    "M11-12": {
+      "evidence": {
+        "capability_state": {
+          "hydraulic_network_ready": false,
+          "hydraulic_parameters_present": false,
+          "real_geometry_available": true,
+          "real_terrain_available": true,
+          "reason": "Real terrain + real drainage geometry available; hydraulic parameters MISSING (synthetic fixture used). HYDRAULIC_NETWORK_READY=False."
+        },
+        "rainfall_status": {
+          "d016_human_review": "REQUIRED",
+          "d016_status": "PREPARED",
+          "profile_status": "PROVISIONAL",
+          "rainfall_fingerprint": "b5b76d98d6346141",
+          "real_time": false,
+          "validated_forecast": false
+        },
+        "result_labels": [
+          "REAL_TERRAIN",
+          "SYNTHETIC_HYDRAULICS",
+          "REAL_TERRAIN_SYNTHETIC_HYDRAULICS",
+          "PROVISIONAL",
+          "NOT_REAL_TIME",
+          "NOT_VALIDATED_FORECAST"
+        ]
+      },
+      "name": "API/dashboard truthfulness",
+      "status": "PASS"
+    }
+  },
+  "generated_at": "2026-08-23T03:14:33.726646+00:00",
+  "overall": "PASS",
+  "wall_seconds": 42.24
+}

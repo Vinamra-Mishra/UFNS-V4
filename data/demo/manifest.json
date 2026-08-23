@@ -1,0 +1,108 @@
+{
+  "assets": [
+    {
+      "asset_uri": "dem.tif",
+      "content_sha256": "8157e3e9191d855e07397673df0a5b5c7f8fcf987f7c386eb2e554dba6884b71",
+      "licence_id": "internal-generated",
+      "native_crs": "EPSG:32645",
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "provenance_class": "SYNTHETIC",
+      "quality_flags": [
+        "SYNTHETIC"
+      ],
+      "role": "dem",
+      "vertical_reference": "SYNTHETIC_LOCAL_DATUM"
+    },
+    {
+      "asset_uri": "rain_index.json",
+      "content_sha256": "28420fccd24a03d213a425a0d0b1a30e52066d17464ae8a53e0dee2f3fb6a7c5",
+      "interval_minutes": 15,
+      "licence_id": "internal-generated",
+      "n_intervals": 12,
+      "native_crs": null,
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "profile_id": "heavy_v1",
+      "provenance_class": "SIMULATED_SCENARIO",
+      "quality_flags": [
+        "SYNTHETIC",
+        "PROVISIONAL"
+      ],
+      "review_status": "PROVISIONAL",
+      "role": "rainfall_fixture"
+    },
+    {
+      "asset_uri": "scenarios.json",
+      "content_sha256": "698671c25991131a8bc67120af3da012ba5fea0ad99fd0ba68ccdaf1a5025bd4",
+      "licence_id": "internal-generated",
+      "native_crs": null,
+      "native_resolution": null,
+      "provenance_class": "SIMULATED_SCENARIO",
+      "quality_flags": [
+        "SYNTHETIC",
+        "PROVISIONAL"
+      ],
+      "review_status": "PROVISIONAL",
+      "role": "scenario_definitions"
+    },
+    {
+      "asset_uri": "preview_dem.png",
+      "content_sha256": "6c08253bf5c9d4a70870ee0388a481b9f52f6cc4d17a95424abf17b6132f3fe5",
+      "licence_id": "internal-generated",
+      "native_crs": null,
+      "native_resolution": null,
+      "provenance_class": "DERIVED",
+      "quality_flags": [],
+      "role": "preview_dem"
+    },
+    {
+      "asset_uri": "preview_rain.png",
+      "content_sha256": "c71be6a90c12de3033f1b4c718e0d8f5625b2b0e4ef4b179bb80cb239c5dd4a8",
+      "licence_id": "internal-generated",
+      "native_crs": null,
+      "native_resolution": null,
+      "provenance_class": "DERIVED",
+      "quality_flags": [],
+      "role": "preview_rain"
+    }
+  ],
+  "bundle_version": "v1",
+  "created_at": "2026-08-21T00:00:00Z",
+  "interchange_crs": "OGC:CRS84",
+  "issue_time": "2026-08-21T00:00:00Z",
+  "pilot_id": "synthetic_wb_fixture_v1",
+  "provisional_notes": [
+    "Synthetic terrain fixture; NOT real topography.",
+    "Rainfall intensities PROVISIONAL (D-016 review before M5)."
+  ],
+  "simulation_grid": {
+    "affine_transform": [
+      30.0,
+      0.0,
+      300000.0,
+      0.0,
+      -30.0,
+      2504020.0
+    ],
+    "bounds": [
+      300000.0,
+      2500000.0,
+      304020.0,
+      2504020.0
+    ],
+    "cell_size_m": 30.0,
+    "crs_wkt_or_epsg": "EPSG:32645",
+    "grid_id": "synthetic_wb_fixture_v1_grid",
+    "height": 134,
+    "nodata": null,
+    "vertical_crs": "SYNTHETIC_LOCAL_DATUM",
+    "width": 134
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "files": [
+    {
+      "lead_minutes": 0,
+      "sha256": "c2ac9f4f8e827092532e3829b1651dea7e7c517af3b473e87447143295926b41",
+      "uri": "rain/rain_000.tif",
+      "valid_from": "2026-08-21T00:00:00Z",
+      "valid_to": "2026-08-21T00:15:00Z"
+    },
+    {
+      "lead_minutes": 15,
+      "sha256": "1b707502192326467b0668208516a66492baf605eebbdee926cc8689d90d1257",
+      "uri": "rain/rain_015.tif",
+      "valid_from": "2026-08-21T00:15:00Z",
+      "valid_to": "2026-08-21T00:30:00Z"
+    },
+    {
+      "lead_minutes": 30,
+      "sha256": "9d7844d3f6183ca05658839ae8fefc71a586a761cfc6e074203b34a8ac0f204b",
+      "uri": "rain/rain_030.tif",
+      "valid_from": "2026-08-21T00:30:00Z",
+      "valid_to": "2026-08-21T00:45:00Z"
+    },
+    {
+      "lead_minutes": 45,
+      "sha256": "f2a1b49e5ec6d3a6ab6aa2d3c32c59b00efa917568b54d9529dcf46e16b7c5ef",
+      "uri": "rain/rain_045.tif",
+      "valid_from": "2026-08-21T00:45:00Z",
+      "valid_to": "2026-08-21T01:00:00Z"
+    },
+    {
+      "lead_minutes": 60,
+      "sha256": "dff1c4561b99b0cfeff5de9134d2e1aa9872cc484cb8223c62fb70eabee7d30d",
+      "uri": "rain/rain_060.tif",
+      "valid_from": "2026-08-21T01:00:00Z",
+      "valid_to": "2026-08-21T01:15:00Z"
+    },
+    {
+      "lead_minutes": 75,
+      "sha256": "8465a5a5a1fe1f8623344d4aeef195f03e080c337b37657603412a3f4b9f49e8",
+      "uri": "rain/rain_075.tif",
+      "valid_from": "2026-08-21T01:15:00Z",
+      "valid_to": "2026-08-21T01:30:00Z"
+    },
+    {
+      "lead_minutes": 90,
+      "sha256": "5ce63da072176a0238cdd656ee579966d6a37cb2f03803df05c660df80ba258c",
+      "uri": "rain/rain_090.tif",
+      "valid_from": "2026-08-21T01:30:00Z",
+      "valid_to": "2026-08-21T01:45:00Z"
+    },
+    {
+      "lead_minutes": 105,
+      "sha256": "54557c5374bd31475d349886723b7cd26e9fbeae90b573d897401d634a458d9b",
+      "uri": "rain/rain_105.tif",
+      "valid_from": "2026-08-21T01:45:00Z",
+      "valid_to": "2026-08-21T02:00:00Z"
+    },
+    {
+      "lead_minutes": 120,
+      "sha256": "19d3ea1985bf8f800aafd0a6fd39a0f21b7ae1feec3602ebc965c939e222aa70",
+      "uri": "rain/rain_120.tif",
+      "valid_from": "2026-08-21T02:00:00Z",
+      "valid_to": "2026-08-21T02:15:00Z"
+    },
+    {
+      "lead_minutes": 135,
+      "sha256": "c3132ba9bbef61fc30cb406232d6f17981575947c7e532fefd4109cfae4d3e0f",
+      "uri": "rain/rain_135.tif",
+      "valid_from": "2026-08-21T02:15:00Z",
+      "valid_to": "2026-08-21T02:30:00Z"
+    },
+    {
+      "lead_minutes": 150,
+      "sha256": "d46140765d6d571f9f1f925012a8803ca061960fc6d13da9685965b3e73b8c23",
+      "uri": "rain/rain_150.tif",
+      "valid_from": "2026-08-21T02:30:00Z",
+      "valid_to": "2026-08-21T02:45:00Z"
+    },
+    {
+      "lead_minutes": 165,
+      "sha256": "aa9a66f200af517c68cc6b19e1595d80340067b689dcedb875cff67085565eb4",
+      "uri": "rain/rain_165.tif",
+      "valid_from": "2026-08-21T02:45:00Z",
+      "valid_to": "2026-08-21T03:00:00Z"
+    }
+  ],
+  "profile": {
+    "derivation": "Alternating-block method (Chow et al. 1988) from provisional depth-duration P(d)=P60*(d/60)^0.4. PROVISIONAL: final M5 parameters require published pilot-region IDF or documented historical event with hydrologist approval (D-016).",
+    "intensities_mmh": [
+      21.28539049981805,
+      12.608070746172615,
+      9.594415188545867,
+      7.960358107847924,
+      6.905872042533815,
+      6.157050927813174,
+      66.6192910476876,
+      6.50285581271271,
+      7.383281141845401,
+      8.676090981311148,
+      10.829153101484195,
+      15.478170402227505
+    ],
+    "interval_minutes": 15,
+    "profile_id": "heavy_v1",
+    "review_status": "PROVISIONAL"
+  }
+}
