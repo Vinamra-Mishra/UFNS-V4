@@ -1,0 +1,16 @@
+# UFNS runtime dependencies (M1 baseline).
+# M2/M3 spike extras: landlab, pyswmm (see requirements-spikes.txt).
+numpy>=1.26
+pydantic>=2.5
+rasterio>=1.3
+affine>=2.4
+pyproj>=3.6
+shapely>=2.0
+pandas>=2.0
+pyarrow>=14.0
+pillow>=10.0
+pytest>=8.0
+# M6 dashboard/API (FastAPI per IMPLEMENTATION_SPEC §9; httpx for the test client)
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27

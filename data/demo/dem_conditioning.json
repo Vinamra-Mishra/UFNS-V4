@@ -1,0 +1,9 @@
+{
+  "operation": "none",
+  "reason": "synthetic fixture; depressions are intentional ponding features",
+  "affected_cells": 0,
+  "volume_change_m3": 0.0,
+  "algorithms": [],
+  "before_sha256": null,
+  "after_sha256": null
+}

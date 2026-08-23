@@ -1,0 +1,5 @@
+# Spike dependencies for M2/M3 (installed separately; verified before use).
+# landlab 2.11 requires requireit<0.9 on Python 3.11 (0.9.0 uses 3.12 syntax).
+landlab>=2.8
+requireit==0.8.0
+pyswmm>=2.0

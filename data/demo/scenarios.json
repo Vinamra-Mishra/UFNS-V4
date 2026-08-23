@@ -1,0 +1,387 @@
+{
+  "extreme": {
+    "description": "Provisional extreme rainfall event (90 mm/3 h).",
+    "drainage_configuration": {
+      "blockage": null,
+      "network_asset_uri": "data/demo/drainage_synthetic.inp",
+      "parameter_status": {
+        "all": "assumed"
+      }
+    },
+    "duration_minutes": 180,
+    "initial_conditions": {
+      "surface_depth_m": 0.0
+    },
+    "issue_time": "2026-08-21T00:00:00Z",
+    "name": "Extreme rainfall",
+    "provenance": {
+      "acquired_at": "2026-08-21T00:00:00Z",
+      "content_sha256": "8157e3e9191d855e07397673df0a5b5c7f8fcf987f7c386eb2e554dba6884b71",
+      "dataset_id": "synthetic_wb_fixture_v1_dem",
+      "licence_id": "internal-generated",
+      "native_crs": "EPSG:32645",
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "processing_steps": [
+        "seeded procedural generation (seed=20260821); no conditioning"
+      ],
+      "provenance_class": "SYNTHETIC",
+      "quality_flags": [
+        "SYNTHETIC"
+      ],
+      "source_name": "UFNS synthetic DSM fixture (seeded procedural terrain)",
+      "source_url": null,
+      "version": "v1"
+    },
+    "rainfall_profile": {
+      "derivation": "Alternating-block method (Chow et al. 1988) from provisional depth-duration P(d)=P60*(d/60)^0.4. PROVISIONAL: final M5 parameters require published pilot-region IDF or documented historical event with hydrologist approval (D-016).",
+      "intensities_mmh": [
+        42.5707809996361,
+        25.21614149234523,
+        19.188830377091733,
+        15.920716215695847,
+        13.81174408506763,
+        12.314101855626348,
+        133.2385820953752,
+        13.00571162542542,
+        14.766562283690803,
+        17.352181962622296,
+        21.65830620296839,
+        30.95634080445501
+      ],
+      "interval_minutes": 15,
+      "profile_id": "extreme_v1",
+      "review_status": "PROVISIONAL"
+    },
+    "rainfall_source": "demo",
+    "random_seed": 20260821,
+    "scenario_id": "extreme",
+    "simulation_grid": {
+      "affine_transform": [
+        30.0,
+        0.0,
+        300000.0,
+        0.0,
+        -30.0,
+        2504020.0
+      ],
+      "bounds": [
+        300000.0,
+        2500000.0,
+        304020.0,
+        2504020.0
+      ],
+      "cell_size_m": 30.0,
+      "crs_wkt_or_epsg": "EPSG:32645",
+      "grid_id": "synthetic_wb_fixture_v1_grid",
+      "height": 134,
+      "nodata": null,
+      "vertical_crs": "SYNTHETIC_LOCAL_DATUM",
+      "width": 134
+    },
+    "simulation_timestep_s": null,
+    "spatial_pattern": "convective_cell",
+    "surface_parameters": {
+      "depression_storage_m": 0.002,
+      "horton_f0_m_s": 6.944444444444445e-06,
+      "horton_fmin_m_s": 5.555555555555555e-07,
+      "horton_k_s1": 0.0005555555555555556,
+      "manning_n": 0.03,
+      "review_status": "PROVISIONAL"
+    }
+  },
+  "extreme_blockage": {
+    "description": "Extreme event with 100% blockage of fixture conduits C4/C9 from t+60 min. Primary demonstration of drainage\u2013rainfall coupling.",
+    "drainage_configuration": {
+      "blockage": {
+        "blocked_links": [
+          "C4",
+          "C9"
+        ],
+        "end_minutes": null,
+        "fraction": 1.0,
+        "implementation_note": "effective-opening reduction; hydraulic change, not a UI label",
+        "start_minutes": 60
+      },
+      "network_asset_uri": "data/demo/drainage_synthetic.inp",
+      "parameter_status": {
+        "all": "assumed"
+      }
+    },
+    "duration_minutes": 180,
+    "initial_conditions": {
+      "surface_depth_m": 0.0
+    },
+    "issue_time": "2026-08-21T00:00:00Z",
+    "name": "Extreme rainfall + drainage blockage",
+    "provenance": {
+      "acquired_at": "2026-08-21T00:00:00Z",
+      "content_sha256": "8157e3e9191d855e07397673df0a5b5c7f8fcf987f7c386eb2e554dba6884b71",
+      "dataset_id": "synthetic_wb_fixture_v1_dem",
+      "licence_id": "internal-generated",
+      "native_crs": "EPSG:32645",
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "processing_steps": [
+        "seeded procedural generation (seed=20260821); no conditioning"
+      ],
+      "provenance_class": "SYNTHETIC",
+      "quality_flags": [
+        "SYNTHETIC"
+      ],
+      "source_name": "UFNS synthetic DSM fixture (seeded procedural terrain)",
+      "source_url": null,
+      "version": "v1"
+    },
+    "rainfall_profile": {
+      "derivation": "Alternating-block method (Chow et al. 1988) from provisional depth-duration P(d)=P60*(d/60)^0.4. PROVISIONAL: final M5 parameters require published pilot-region IDF or documented historical event with hydrologist approval (D-016).",
+      "intensities_mmh": [
+        42.5707809996361,
+        25.21614149234523,
+        19.188830377091733,
+        15.920716215695847,
+        13.81174408506763,
+        12.314101855626348,
+        133.2385820953752,
+        13.00571162542542,
+        14.766562283690803,
+        17.352181962622296,
+        21.65830620296839,
+        30.95634080445501
+      ],
+      "interval_minutes": 15,
+      "profile_id": "extreme_blockage_v1",
+      "review_status": "PROVISIONAL"
+    },
+    "rainfall_source": "demo",
+    "random_seed": 20260821,
+    "scenario_id": "extreme_blockage",
+    "simulation_grid": {
+      "affine_transform": [
+        30.0,
+        0.0,
+        300000.0,
+        0.0,
+        -30.0,
+        2504020.0
+      ],
+      "bounds": [
+        300000.0,
+        2500000.0,
+        304020.0,
+        2504020.0
+      ],
+      "cell_size_m": 30.0,
+      "crs_wkt_or_epsg": "EPSG:32645",
+      "grid_id": "synthetic_wb_fixture_v1_grid",
+      "height": 134,
+      "nodata": null,
+      "vertical_crs": "SYNTHETIC_LOCAL_DATUM",
+      "width": 134
+    },
+    "simulation_timestep_s": null,
+    "spatial_pattern": "convective_cell",
+    "surface_parameters": {
+      "depression_storage_m": 0.002,
+      "horton_f0_m_s": 6.944444444444445e-06,
+      "horton_fmin_m_s": 5.555555555555555e-07,
+      "horton_k_s1": 0.0005555555555555556,
+      "manning_n": 0.03,
+      "review_status": "PROVISIONAL"
+    }
+  },
+  "heavy": {
+    "description": "Provisional heavy rainfall event (45 mm/3 h).",
+    "drainage_configuration": {
+      "blockage": null,
+      "network_asset_uri": "data/demo/drainage_synthetic.inp",
+      "parameter_status": {
+        "all": "assumed"
+      }
+    },
+    "duration_minutes": 180,
+    "initial_conditions": {
+      "surface_depth_m": 0.0
+    },
+    "issue_time": "2026-08-21T00:00:00Z",
+    "name": "Heavy rainfall",
+    "provenance": {
+      "acquired_at": "2026-08-21T00:00:00Z",
+      "content_sha256": "8157e3e9191d855e07397673df0a5b5c7f8fcf987f7c386eb2e554dba6884b71",
+      "dataset_id": "synthetic_wb_fixture_v1_dem",
+      "licence_id": "internal-generated",
+      "native_crs": "EPSG:32645",
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "processing_steps": [
+        "seeded procedural generation (seed=20260821); no conditioning"
+      ],
+      "provenance_class": "SYNTHETIC",
+      "quality_flags": [
+        "SYNTHETIC"
+      ],
+      "source_name": "UFNS synthetic DSM fixture (seeded procedural terrain)",
+      "source_url": null,
+      "version": "v1"
+    },
+    "rainfall_profile": {
+      "derivation": "Alternating-block method (Chow et al. 1988) from provisional depth-duration P(d)=P60*(d/60)^0.4. PROVISIONAL: final M5 parameters require published pilot-region IDF or documented historical event with hydrologist approval (D-016).",
+      "intensities_mmh": [
+        21.28539049981805,
+        12.608070746172615,
+        9.594415188545867,
+        7.960358107847924,
+        6.905872042533815,
+        6.157050927813174,
+        66.6192910476876,
+        6.50285581271271,
+        7.383281141845401,
+        8.676090981311148,
+        10.829153101484195,
+        15.478170402227505
+      ],
+      "interval_minutes": 15,
+      "profile_id": "heavy_v1",
+      "review_status": "PROVISIONAL"
+    },
+    "rainfall_source": "demo",
+    "random_seed": 20260821,
+    "scenario_id": "heavy",
+    "simulation_grid": {
+      "affine_transform": [
+        30.0,
+        0.0,
+        300000.0,
+        0.0,
+        -30.0,
+        2504020.0
+      ],
+      "bounds": [
+        300000.0,
+        2500000.0,
+        304020.0,
+        2504020.0
+      ],
+      "cell_size_m": 30.0,
+      "crs_wkt_or_epsg": "EPSG:32645",
+      "grid_id": "synthetic_wb_fixture_v1_grid",
+      "height": 134,
+      "nodata": null,
+      "vertical_crs": "SYNTHETIC_LOCAL_DATUM",
+      "width": 134
+    },
+    "simulation_timestep_s": null,
+    "spatial_pattern": "convective_cell",
+    "surface_parameters": {
+      "depression_storage_m": 0.002,
+      "horton_f0_m_s": 6.944444444444445e-06,
+      "horton_fmin_m_s": 5.555555555555555e-07,
+      "horton_k_s1": 0.0005555555555555556,
+      "manning_n": 0.03,
+      "review_status": "PROVISIONAL"
+    }
+  },
+  "normal": {
+    "description": "Provisional normal rainfall event (20 mm/3 h).",
+    "drainage_configuration": {
+      "blockage": null,
+      "network_asset_uri": "data/demo/drainage_synthetic.inp",
+      "parameter_status": {
+        "all": "assumed"
+      }
+    },
+    "duration_minutes": 180,
+    "initial_conditions": {
+      "surface_depth_m": 0.0
+    },
+    "issue_time": "2026-08-21T00:00:00Z",
+    "name": "Normal rainfall",
+    "provenance": {
+      "acquired_at": "2026-08-21T00:00:00Z",
+      "content_sha256": "8157e3e9191d855e07397673df0a5b5c7f8fcf987f7c386eb2e554dba6884b71",
+      "dataset_id": "synthetic_wb_fixture_v1_dem",
+      "licence_id": "internal-generated",
+      "native_crs": "EPSG:32645",
+      "native_resolution": {
+        "unit": "m",
+        "x": 30.0,
+        "y": 30.0
+      },
+      "processing_steps": [
+        "seeded procedural generation (seed=20260821); no conditioning"
+      ],
+      "provenance_class": "SYNTHETIC",
+      "quality_flags": [
+        "SYNTHETIC"
+      ],
+      "source_name": "UFNS synthetic DSM fixture (seeded procedural terrain)",
+      "source_url": null,
+      "version": "v1"
+    },
+    "rainfall_profile": {
+      "derivation": "Alternating-block method (Chow et al. 1988) from provisional depth-duration P(d)=P60*(d/60)^0.4. PROVISIONAL: final M5 parameters require published pilot-region IDF or documented historical event with hydrologist approval (D-016).",
+      "intensities_mmh": [
+        9.460173555474686,
+        5.603586998298951,
+        4.264184528242602,
+        3.5379369368213105,
+        3.0692764633483733,
+        2.736467079028074,
+        29.60857379897227,
+        2.8901581389834234,
+        3.2814582852646055,
+        3.8560404361382865,
+        4.812956933992979,
+        6.87918684543444
+      ],
+      "interval_minutes": 15,
+      "profile_id": "normal_v1",
+      "review_status": "PROVISIONAL"
+    },
+    "rainfall_source": "demo",
+    "random_seed": 20260821,
+    "scenario_id": "normal",
+    "simulation_grid": {
+      "affine_transform": [
+        30.0,
+        0.0,
+        300000.0,
+        0.0,
+        -30.0,
+        2504020.0
+      ],
+      "bounds": [
+        300000.0,
+        2500000.0,
+        304020.0,
+        2504020.0
+      ],
+      "cell_size_m": 30.0,
+      "crs_wkt_or_epsg": "EPSG:32645",
+      "grid_id": "synthetic_wb_fixture_v1_grid",
+      "height": 134,
+      "nodata": null,
+      "vertical_crs": "SYNTHETIC_LOCAL_DATUM",
+      "width": 134
+    },
+    "simulation_timestep_s": null,
+    "spatial_pattern": "convective_cell",
+    "surface_parameters": {
+      "depression_storage_m": 0.002,
+      "horton_f0_m_s": 6.944444444444445e-06,
+      "horton_fmin_m_s": 5.555555555555555e-07,
+      "horton_k_s1": 0.0005555555555555556,
+      "manning_n": 0.03,
+      "review_status": "PROVISIONAL"
+    }
+  }
+}

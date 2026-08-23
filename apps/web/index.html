@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UFNS — Flood-Aware Decision Support (M9)</title>
+<style>
+  :root {
+    --bg:#0e141d; --panel:#161e29; --panel2:#1c2633; --ink:#e8eef5; --muted:#93a1b4;
+    --line:#28323f; --blue:#4a9ee8; --blue-bg:#12283d; --green:#4cc38a;
+    --amber:#e0a94f; --amber-bg:#33260f; --red:#e06c5c; --red-bg:#351716;
+    --purple:#b48bf0; --grey:#7f8b99; --grey-bg:#232b36;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body { font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+         background:var(--bg); color:var(--ink); font-size:13px; overflow:hidden; }
+  header { background:#0a0f16; border-bottom:1px solid var(--line); padding:10px 16px;
+           display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  header h1 { margin:0; font-size:16px; font-weight:600; }
+  header .sub { color:var(--muted); font-size:11px; }
+  .badges { display:flex; flex-wrap:wrap; gap:5px; margin-left:auto; }
+  .tag { font-size:10px; padding:2px 7px; border-radius:3px; font-weight:600; letter-spacing:.3px; white-space:nowrap; }
+  .tag.synth { background:var(--grey-bg); color:#b6c1ce; }
+  .tag.sim { background:var(--blue-bg); color:var(--blue); }
+  .tag.prov { background:var(--amber-bg); color:var(--amber); }
+  .tag.warn { background:var(--red-bg); color:var(--red); }
+  .tag.demo { background:var(--grey-bg); color:var(--purple); }
+
+  #app { display:grid; grid-template-columns:250px 1fr; grid-template-rows:1fr 84px 150px;
+         height:calc(100vh - 56px); }
+  .left { grid-row:1/3; border-right:1px solid var(--line); overflow-y:auto; padding:12px; }
+  .mapwrap { position:relative; grid-column:2; grid-row:1; overflow:hidden; background:#0a0f16; }
+  #map { display:block; width:100%; height:100%; cursor:grab; }
+  #map.dragging { cursor:grabbing; }
+  .map-ui { position:absolute; top:10px; left:10px; background:rgba(22,30,41,.94);
+            border:1px solid var(--line); border-radius:6px; padding:10px; min-width:170px; }
+  .map-ui h3 { margin:0 0 8px; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
+  .layer { display:flex; align-items:center; gap:7px; padding:3px 0; cursor:pointer; font-size:12px; }
+  .layer input { accent-color:var(--blue); }
+  .legend { position:absolute; bottom:10px; left:10px; background:rgba(22,30,41,.94);
+            border:1px solid var(--line); border-radius:6px; padding:10px; font-size:11px; }
+  .legend .bar { height:10px; width:150px; border-radius:2px;
+                 background:linear-gradient(90deg,#f5f8ff,#b4d7fa,#50a0f0,#1e5ac8,#c82848,#780f1e); }
+  .legend .labels { display:flex; justify-content:space-between; color:var(--muted); margin-top:2px; }
+  .legend .sw { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:-1px; margin-right:5px; }
+  .tooltip { position:absolute; pointer-events:none; background:rgba(10,15,22,.95);
+             border:1px solid var(--line); border-radius:4px; padding:6px 8px; font-size:11px; display:none; }
+
+  .timeline { grid-column:2; grid-row:2; border-top:1px solid var(--line); padding:10px 14px;
+              display:flex; flex-direction:column; gap:6px; justify-content:center; }
+  .tcontrols { display:flex; align-items:center; gap:8px; }
+  .tcontrols button { background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+                      border-radius:5px; width:32px; height:32px; cursor:pointer; font-size:14px; }
+  .tcontrols button:hover { border-color:var(--blue); }
+  .tcontrols button.on { background:var(--blue-bg); border-color:var(--blue); }
+  .tclock { font-variant-numeric:tabular-nums; font-weight:600; margin-left:8px; }
+  input[type=range] { flex:1; accent-color:var(--blue); }
+  .speed { display:flex; gap:4px; }
+  .speed button { background:var(--panel2); color:var(--muted); border:1px solid var(--line);
+                  border-radius:4px; padding:2px 8px; cursor:pointer; font-size:11px; }
+  .speed button.on { color:var(--ink); border-color:var(--blue); background:var(--blue-bg); }
+
+  .metrics { grid-column:2; grid-row:3; border-top:1px solid var(--line); padding:8px 14px;
+             display:flex; gap:10px; overflow-x:auto; }
+  .metric { background:var(--panel); border:1px solid var(--line); border-radius:6px;
+            padding:8px 12px; min-width:120px; }
+  .metric .k { color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.4px; }
+  .metric .v { font-size:16px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:2px; }
+  .metric .u { font-size:10px; color:var(--muted); }
+
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px; }
+  .panel h2 { margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
+  .scenario { border:1px solid var(--line); background:var(--panel2); border-radius:6px;
+              padding:10px; cursor:pointer; margin-bottom:8px; }
+  .scenario:hover { border-color:var(--blue); }
+  .scenario.active { border-color:var(--blue); background:var(--blue-bg); }
+  .scenario .name { font-weight:600; font-size:13px; }
+  .scenario .meta { font-size:11px; color:var(--muted); margin-top:3px; line-height:1.5; }
+  .kv { display:grid; grid-template-columns:1fr auto; gap:3px 10px; font-size:12px; }
+  .kv dt { color:var(--muted); }
+  .kv dd { margin:0; font-variant-numeric:tabular-nums; text-align:right; }
+  .mono { font-family:ui-monospace,Menlo,monospace; font-size:11px; word-break:break-all; }
+  .btn { background:var(--blue-bg); color:var(--blue); border:1px solid var(--blue);
+         border-radius:5px; padding:6px 10px; cursor:pointer; font-size:12px; font-weight:600; }
+  .btn:hover { filter:brightness(1.15); }
+  .btn.ghost { background:transparent; color:var(--muted); border-color:var(--line); }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .pill { font-size:10px; padding:1px 6px; border-radius:3px; font-weight:700; }
+  .pill.DRY{background:#2a333d;color:#b6c1ce} .pill.LOW_IMPACT{background:#33280c;color:#e0c04a}
+  .pill.CAUTION{background:#33240e;color:#e8871e} .pill.HIGH_IMPACT{background:#351512;color:#e06c5c}
+  .pill.IMPASSABLE{background:#3a1220;color:#f07a8a}
+  .routecard { border:1px solid var(--line); border-radius:6px; padding:10px; margin-top:8px; }
+  .routecard .big { font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .routecard .lbl { color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.4px; }
+  .insight { border-left:3px solid var(--amber); background:var(--amber-bg); padding:7px 10px;
+             border-radius:4px; margin-top:6px; font-size:12px; }
+  .insight.ok { border-color:var(--green); background:#12302100; }
+  .explain { color:var(--muted); font-size:12px; margin-top:6px; line-height:1.5; }
+  details.prov { margin-top:8px; border:1px solid var(--line); border-radius:6px; padding:8px 10px; }
+  details.prov summary { cursor:pointer; font-size:12px; font-weight:600; color:var(--blue); }
+  .muted { color:var(--muted); }
+  .err { color:var(--red); background:var(--red-bg); padding:8px 10px; border-radius:5px; font-size:12px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th,td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:900px) { .two { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>UFNS — Flood-Aware Decision Support</h1>
+  <span class="sub">neighbourhood-scale flood screening · SIH26085 · M9 persistence projection + M8 nowcast + M7 routing</span>
+  <div class="badges">
+    <span class="tag synth">SYNTHETIC FIXTURE</span>
+    <span class="tag sim">SIMULATED</span>
+    <span class="tag prov">PROVISIONAL · D-016 PREPARED</span>
+    <span class="tag demo">PERSISTENCE PROJECTION</span>
+    <span class="tag demo">B13-DEMO-V1 (PROVISIONAL)</span>
+    <span class="tag warn">NOT_REAL_TIME</span>
+    <span class="tag warn">NOT_VALIDATED FORECAST</span>
+    <span class="tag warn">NOT FOR OPERATIONAL USE</span>
+  </div>
+</header>
+
+<div id="app">
+  <aside class="left">
+    <div class="panel" style="margin-bottom:10px" id="rainfall-panel">
+      <h2>Rainfall + Nowcast</h2>
+      <div id="rainfall-status" class="muted">Loading…</div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px" id="projection-panel">
+      <h2>M9 · PERSISTENCE PROJECTION</h2>
+      <div class="row" style="margin-bottom:6px">
+        <select id="view-mode" class="btn ghost">
+          <option value="scenario">Historical M5 scenarios</option>
+          <option value="projection">M9 persistence projection</option>
+        </select>
+        <select id="projection-config" class="btn ghost"></select>
+      </div>
+      <div id="projection-status" class="muted">Loading…</div>
+      <div style="margin-top:6px;font-size:10px;color:var(--amber)">PERSISTENCE PROJECTION · NOT_REAL_TIME · NOT_VALIDATED FORECAST</div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px">
+      <h2>1 · Scenario</h2>
+      <div id="scenarios"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px">
+      <h2>2 · Inspect road</h2>
+      <div id="road-panel" class="muted">Click a road on the map.</div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px">
+      <h2>3 · Route around it</h2>
+      <div class="row" style="margin-bottom:6px">
+        <button class="btn" id="tool-origin">Set origin</button>
+        <button class="btn" id="tool-dest">Set destination</button>
+        <select id="route-mode" class="btn ghost">
+          <option value="flood_aware">Flood-aware</option>
+          <option value="avoid_impassable">Avoid impassable</option>
+        </select>
+      </div>
+      <div class="row" style="margin-bottom:6px">
+        <input type="text" id="inp-origin" placeholder="Orig X,Y" class="btn ghost" style="width:110px">
+        <input type="text" id="inp-dest" placeholder="Dest X,Y" class="btn ghost" style="width:110px">
+      </div>
+      <div id="route-panel" class="muted">Pick an origin and a destination on the map.</div>
+    </div>
+
+    <div class="panel" style="margin-bottom:10px">
+      <h2>What changed? S3 → S4</h2>
+      <div id="comparison"></div>
+    </div>
+
+    <details class="prov">
+      <summary>Scientific provenance</summary>
+      <div class="kv" id="provenance"></div>
+    </details>
+  </aside>
+
+  <div class="mapwrap">
+    <canvas id="map"></canvas>
+    <div class="map-ui">
+      <h3>Layers</h3>
+      <label class="layer"><input type="checkbox" data-layer="depth" checked> Flood depth</label>
+      <label class="layer"><input type="checkbox" data-layer="extent"> Flood extent</label>
+      <label class="layer"><input type="checkbox" data-layer="rainfall"> Rainfall</label>
+      <label class="layer"><input type="checkbox" data-layer="roads" checked> Roads</label>
+      <label class="layer"><input type="checkbox" data-layer="impact" checked> Road impact</label>
+      <label class="layer"><input type="checkbox" data-layer="drainage"> Inlets / vent</label>
+      <label class="layer"><input type="checkbox" data-layer="routes" checked> Routes</label>
+    </div>
+    <div class="legend">
+      <div style="display:flex;align-items:center;gap:6px"><span class="bar"></span> Flood depth (m)</div>
+      <div class="labels"><span>0</span><span>0.05</span><span>0.15</span><span>0.30</span><span>0.50</span><span>1.0+</span></div>
+      <div style="margin-top:6px">
+        <span class="sw" style="background:#7f8b99"></span>DRY
+        <span class="sw" style="background:#e0c04a"></span>LOW
+        <span class="sw" style="background:#e8871e"></span>CAUTION
+        <span class="sw" style="background:#e06c5c"></span>HIGH
+        <span class="sw" style="background:#7a1f3d"></span>IMPASSABLE
+      </div>
+      <div style="margin-top:4px">
+        <span style="color:#6ea8e0">━ ━</span> normal route &nbsp;
+        <span style="color:#4cc38a">━━</span> flood-aware
+      </div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <div class="timeline">
+    <div class="tcontrols">
+      <button id="btn-restart" title="Restart">⏮</button>
+      <button id="btn-step-back" title="Step back">◀</button>
+      <button id="btn-play" title="Play/pause">▶</button>
+      <button id="btn-step-fwd" title="Step forward">▶</button>
+      <button id="btn-end" title="End">⏭</button>
+      <span class="tclock" id="clock">01:50:00 / 03:00:00</span>
+      <div class="speed" id="speed"></div>
+    </div>
+    <input type="range" id="lead-slider" min="0" max="180" step="5" value="110">
+    <div class="row muted" style="font-size:11px">
+      <span id="insights-label">Simulation time</span>
+    </div>
+  </div>
+
+  <div class="metrics" id="metrics"></div>
+</div>
+
+<script>
+"use strict";
+const API = "";
+const $ = (id) => document.getElementById(id);
+
+// Projected EPSG:32645 fixture bounds (matches backend grid metadata).
+const XMIN=300000, YMIN=2500000, XMAX=304020, YMAX=2504020;
+const DOMAIN=4020, CELL=30, N=134;
+
+const state = {
+  viewMode:"scenario",
+  scenario:"S4",
+  projectionConfig:"P_NORMAL",
+  lead:110,
+  playing:false,
+  speed:1,
+  layers:{ depth:true, extent:false, rainfall:false, roads:true, impact:true, drainage:false, routes:true },
+  routeMode:"flood_aware", tool:"select",
+  origin:null, dest:null, route:null, selectedRoad:null,
+};
+
+let scenarios=[], roads=[], networkMeta=null, drainPts=null, policy=null;
+let scenarioMeta={}, scenarioResult={}, frame=null;
+let projectionConfigs=[], projectionSummaryData=null, projectionStatusData=null;
+const frameCache = new Map();
+const roadsById = new Map();
+
+// Map view transform.
+let view = { scale:1, ox:0, oy:0 };
+let depthCanvas=null, extentCanvas=null, rainCanvas=null;
+let rainData=null;
+
+// ---------------------------------------------------------------- colormaps
+const DEPTH_STOPS = [
+  [0.00,[245,248,255]],[0.05,[180,215,250]],[0.15,[80,160,240]],
+  [0.30,[30,90,200]],[0.50,[200,40,120]],[1.00,[120,10,30]],
+];
+function depthColor(d) {
+  if (d <= 0.05) return null;          // dry -> transparent
+  const s = DEPTH_STOPS;
+  for (let i=0;i<s.length-1;i++) {
+    if (d >= s[i][0] && d < s[i+1][0]) {
+      const t = (d - s[i][0]) / (s[i+1][0]-s[i][0]);
+      const a=s[i][1], b=s[i+1][1];
+      return [Math.round(a[0]+(b[0]-a[0])*t), Math.round(a[1]+(b[1]-a[1])*t), Math.round(a[2]+(b[2]-a[2])*t)];
+    }
+  }
+  return [120,10,30];
+}
+function rainColor(v) {
+  if (v <= 0.01) return null;
+  const t = Math.min(v/60, 1);
+  return [Math.round(40+215*t), Math.round(120+30*t), Math.round(255-235*t)];
+}
+const IMPACT_COLORS = { DRY:"#7f8b99", LOW_IMPACT:"#e0c04a", CAUTION:"#e8871e", HIGH_IMPACT:"#e06c5c", IMPASSABLE:"#7a1f3d" };
+
+// ---------------------------------------------------------------- transforms
+function w2s(x,y){ return [(x-XMIN)*view.scale+view.ox, (YMAX-y)*view.scale+view.oy]; }
+function s2w(px,py){ return [XMIN+(px-view.ox)/view.scale, YMAX-(py-view.oy)/view.scale]; }
+function worldToCell(x,y){
+  let c = Math.floor((x-XMIN)/CELL), r = Math.floor((YMAX-y)/CELL);
+  return [Math.max(0,Math.min(N-1,r)), Math.max(0,Math.min(N-1,c))];
+}
+
+// ---------------------------------------------------------------- fetch utils
+async function getJSON(path) {
+  const r = await fetch(API+path, {headers:{"Accept":"application/json"}});
+  if (!r.ok) {
+    let m=r.statusText;
+    let code=null;
+    try{const j=await r.json(); m=(j.error&&j.error.message)||m; code=(j.error&&j.error.code)||null;}catch(e){}
+    const err = new Error(m);
+    err.statusCode = r.status;
+    err.errorCode = code;
+    throw err;
+  }
+  return r.json();
+}
+function fmt(n,d=2){ if(n===null||n===undefined) return "—"; return Number(n).toLocaleString(undefined,{maximumFractionDigits:d}); }
+function mmss(s){ s=Math.round(s); const m=Math.floor(s/60), ss=s%60; return m+" min "+(ss<10?"0":"")+ss+" s"; }
+function hhmm(lead){ const h=Math.floor(lead/60), m=lead%60; return (h<10?"0":"")+h+":"+(m<10?"0":"")+m+":00"; }
+function isProjectionMode(){ return state.viewMode === "projection"; }
+function validLeadValues(){ return isProjectionMode() ? [0,15,30,45,60] : Array.from({length:37}, (_,i)=>i*5); }
+function clampLead(lead){
+  const vals = validLeadValues();
+  if (vals.includes(lead)) return lead;
+  if (lead <= vals[0]) return vals[0];
+  if (lead >= vals[vals.length-1]) return vals[vals.length-1];
+  // Find the nearest valid lead; ties round to the lower value (deterministic).
+  let best = vals[0], bestDist = Math.abs(lead - vals[0]);
+  for (let i = 1; i < vals.length; i++) {
+    const dist = Math.abs(lead - vals[i]);
+    if (dist < bestDist) { best = vals[i]; bestDist = dist; }
+    // On tie, keep the earlier (lower) value — already selected.
+  }
+  return best;
+}
+function updateLeadControl(){
+  const slider = $("lead-slider");
+  if (isProjectionMode()) {
+    slider.min = 0; slider.max = 60; slider.step = 15;
+    state.lead = clampLead(state.lead);
+    $("insights-label").textContent = "Projection lead";
+  } else {
+    slider.min = 0; slider.max = 180; slider.step = 5;
+    state.lead = clampLead(state.lead);
+    $("insights-label").textContent = "Simulation time";
+  }
+  slider.value = state.lead;
+  $("clock").textContent = hhmm(state.lead) + (isProjectionMode() ? " / 01:00:00" : " / 03:00:00");
+}
+
+// ---------------------------------------------------------------- canvas setup
+const canvas = $("map"), ctx = canvas.getContext("2d");
+function resize(){
+  const r = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = r.width*dpr; canvas.height = r.height*dpr;
+  canvas.style.width = r.width+"px"; canvas.style.height = r.height+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  fit();
+}
+function fit(){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  view.scale = Math.min(w,h)/DOMAIN;
+  view.ox = (w - DOMAIN*view.scale)/2;
+  view.oy = (h - DOMAIN*view.scale)/2;
+}
+
+// ---------------------------------------------------------------- layer canvases
+function buildDepthCanvas(f){
+  const c = document.createElement("canvas"); c.width=N; c.height=N;
+  const g = c.getContext("2d"); const img = g.createImageData(N,N);
+  const d = f.depth;
+  for (let i=0;i<N*N;i++){
+    const col = depthColor(d[i]);
+    if (col){ img.data[i*4]=col[0]; img.data[i*4+1]=col[1]; img.data[i*4+2]=col[2]; img.data[i*4+3]=255; }
+    else img.data[i*4+3]=0;
+  }
+  g.putImageData(img,0,0);
+  return c;
+}
+function buildExtentCanvas(f){
+  const c = document.createElement("canvas"); c.width=N; c.height=N;
+  const g = c.getContext("2d"); const img = g.createImageData(N,N);
+  const d = f.depth, thr = f.extent_threshold_m;
+  for (let i=0;i<N*N;i++){
+    if (d[i] > thr){ img.data[i*4]=15; img.data[i*4+1]=70; img.data[i*4+2]=150; img.data[i*4+3]=230; }
+  }
+  g.putImageData(img,0,0);
+  return c;
+}
+function buildRainCanvas(rain){
+  const c = document.createElement("canvas"); c.width=N; c.height=N;
+  const g = c.getContext("2d"); const img = g.createImageData(N,N);
+  const v = rain.values;
+  for (let i=0;i<N*N;i++){
+    const col = rainColor(v[i]);
+    if (col){ img.data[i*4]=col[0]; img.data[i*4+1]=col[1]; img.data[i*4+2]=col[2]; img.data[i*4+3]=200; }
+  }
+  g.putImageData(img,0,0);
+  return c;
+}
+
+// ---------------------------------------------------------------- drawing
+function draw(){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "#0a0f16"; ctx.fillRect(0,0,w,h);
+
+  // land (base)
+  const [x0,y0] = w2s(XMIN,YMAX), [x1,y1] = w2s(XMAX,YMIN);
+  ctx.fillStyle = "#222a33"; ctx.fillRect(x0,y0,x1-x0,y1-y0);
+
+  // flood depth / extent
+  if (frame) {
+    if (state.layers.depth && depthCanvas) ctx.drawImage(depthCanvas, x0, y0, x1-x0, y1-y0);
+    if (state.layers.extent && extentCanvas) ctx.drawImage(extentCanvas, x0, y0, x1-x0, y1-y0);
+    if (state.layers.rainfall && rainCanvas) ctx.drawImage(rainCanvas, x0, y0, x1-x0, y1-y0);
+  }
+
+  // roads (base grey)
+  if (state.layers.roads || state.layers.impact) {
+    for (const r of roads) {
+      ctx.strokeStyle = "#55606c";
+      if (state.layers.impact && frame) {
+        const imp = impactFor(r.road_id);
+        ctx.strokeStyle = IMPACT_COLORS[imp ? imp.classification : "DRY"] || "#55606c";
+      }
+      ctx.lineWidth = Math.max(1.5, 30*view.scale*0.28);
+      ctx.beginPath();
+      const p0 = w2s(r.geometry[0][0], r.geometry[0][1]);
+      ctx.moveTo(p0[0], p0[1]);
+      for (let i=1;i<r.geometry.length;i++){ const p=w2s(r.geometry[i][0], r.geometry[i][1]); ctx.lineTo(p[0],p[1]); }
+      ctx.stroke();
+    }
+  }
+
+  // drainage points
+  if (state.layers.drainage && drainPts) {
+    for (const pt of drainPts.inlets){ dot(w2s(pt[0],pt[1]), "#4a9ee8", 4); }
+    dot(w2s(drainPts.vent[0],drainPts.vent[1]), "#e0a94f", 6);
+  }
+
+  // routes
+  if (state.layers.routes && state.route) {
+    const r = state.route;
+    if (r.status === "NO_SAFE_ROUTE") {
+      ctx.fillStyle = "#e06c5c"; ctx.font = "13px sans-serif";
+      ctx.fillText("NO SAFE ROUTE AVAILABLE", 12, 24);
+    } else {
+      drawRoute(r.baseline, "#6ea8e0", true);
+      drawRoute(r.flood_aware, "#4cc38a", false);
+      // highlight avoided roads
+      for (const rid of (r.difference.avoided_roads||[])) {
+        const seg = roadsById.get(rid); if(!seg) continue;
+        ctx.strokeStyle = "rgba(224,108,92,0.85)"; ctx.lineWidth = Math.max(2.5, 30*view.scale*0.4);
+        ctx.beginPath(); const a=w2s(seg.geometry[0][0],seg.geometry[0][1]); ctx.moveTo(a[0],a[1]);
+        for (let i=1;i<seg.geometry.length;i++){const p=w2s(seg.geometry[i][0],seg.geometry[i][1]);ctx.lineTo(p[0],p[1]);}
+        ctx.stroke();
+      }
+    }
+  }
+
+  // selected road highlight
+  if (state.selectedRoad) {
+    const seg = roadsById.get(state.selectedRoad); if (seg) {
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = Math.max(2.5, 30*view.scale*0.45);
+      ctx.beginPath(); const a=w2s(seg.geometry[0][0],seg.geometry[0][1]); ctx.moveTo(a[0],a[1]);
+      for (let i=1;i<seg.geometry.length;i++){const p=w2s(seg.geometry[i][0],seg.geometry[i][1]);ctx.lineTo(p[0],p[1]);}
+      ctx.stroke();
+    }
+  }
+
+  // origin/destination
+  if (state.origin) marker(w2s(state.origin[0],state.origin[1]), "#4cc38a", "O");
+  if (state.dest) marker(w2s(state.dest[0],state.dest[1]), "#e06c5c", "D");
+}
+function dot(p, color, rad){ ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p[0],p[1],rad,0,7); ctx.fill(); ctx.strokeStyle="#0a0f16"; ctx.lineWidth=1.5; ctx.stroke(); }
+function marker(p, color, label){
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p[0],p[1],7,0,7); ctx.fill();
+  ctx.fillStyle="#0a0f16"; ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(label, p[0], p[1]+0.5);
+}
+function drawRoute(route, color, dashed){
+  if (!route) return;
+  ctx.strokeStyle = color; ctx.lineWidth = Math.max(2, 30*view.scale*0.32);
+  if (dashed) ctx.setLineDash([6,4]); else ctx.setLineDash([]);
+  ctx.beginPath();
+  const p0=w2s(route.geometry[0][0],route.geometry[0][1]); ctx.moveTo(p0[0],p0[1]);
+  for (let i=1;i<route.geometry.length;i++){const p=w2s(route.geometry[i][0],route.geometry[i][1]);ctx.lineTo(p[0],p[1]);}
+  ctx.stroke(); ctx.setLineDash([]);
+}
+function impactFor(roadId){
+  if (!frame) return null;
+  return frame.road_impacts.find(x => x.road_id === roadId) || null;
+}
+
+// ---------------------------------------------------------------- data loading
+async function loadFrame(id, lead, force){
+  const key = `${state.viewMode}:${id}:${lead}`;
+  if (!force && frameCache.has(key)) return frameCache.get(key);
+  const path = isProjectionMode()
+    ? `/api/v1/projections/nowcast/${id}/frame?lead=${lead}`
+    : `/api/v1/scenarios/${id}/frame?lead=${lead}`;
+  const f = await getJSON(path);
+  frameCache.set(key, f);
+  return f;
+}
+async function loadRain(id, lead){
+  const path = isProjectionMode()
+    ? `/api/v1/projections/nowcast/${id}/rainfall?lead=${lead}`
+    : `/api/v1/scenarios/${id}/rainfall?lead=${lead}`;
+  rainData = await getJSON(path);
+  rainCanvas = buildRainCanvas(rainData);
+}
+async function preloadScenario(id){
+  const proms = [];
+  for (let l=0;l<=180;l+=5) proms.push(loadFrame(id,l).catch(()=>null));
+  await Promise.all(proms);
+}
+async function preloadProjection(id){
+  const proms = [];
+  for (const l of [0,15,30,45,60]) proms.push(loadFrame(id,l).catch(()=>null));
+  await Promise.all(proms);
+}
+
+let _leadReq = 0;
+async function setLead(lead, force){
+  state.lead = clampLead(lead);
+  updateLeadControl();
+  const activeId = isProjectionMode() ? state.projectionConfig : state.scenario;
+  const token = ++_leadReq;
+  try {
+    const res = await loadFrame(activeId, state.lead, force);
+    if (token !== _leadReq) return;
+    frame = res;
+  } catch (e) {
+    if (token !== _leadReq) return;
+    // Only 503 + PROJECTION_UNAVAILABLE is the documented "unavailable" state;
+    // other 503s are infrastructure failures and must surface as errors.
+    if (isProjectionMode() && e.statusCode === 503 && e.errorCode === "PROJECTION_UNAVAILABLE") {
+      frame = null;
+      depthCanvas = null;
+      extentCanvas = null;
+      renderMetrics();
+      renderProjectionUnavailable();
+      renderProvenance();
+      return;
+    }
+    throw e;
+  }
+  if (token !== _leadReq) return;
+  depthCanvas = buildDepthCanvas(frame);
+  extentCanvas = buildExtentCanvas(frame);
+  if (state.layers.rainfall) await loadRain(activeId, state.lead);
+  if (token !== _leadReq) return;
+  renderMetrics();
+  renderInsights();
+  renderRoadPanel();
+  renderRoutePanel();
+  renderProvenance();
+  draw();
+}
+
+async function selectScenario(id){
+  state.scenario = id;
+  document.querySelectorAll(".scenario").forEach(s=>s.classList.toggle("active", s.dataset.id===id));
+  const [meta, result, rain] = await Promise.all([
+    getJSON(`/api/v1/scenarios/${id}`),
+    getJSON(`/api/v1/scenarios/${id}/result`),
+    getJSON(`/api/v1/scenarios/${id}/rainfall?lead=${clampLead(state.lead)}`),
+  ]);
+  scenarioMeta = meta; scenarioResult = result;
+  rainData = rain; rainCanvas = buildRainCanvas(rain);
+  state.route = null; state.selectedRoad = null; state.origin = null; state.dest = null;
+  renderScenarioMeta();
+  renderComparison();
+  renderRoadPanel();
+  renderRoutePanel();
+  renderProvenance();
+  if (!isProjectionMode()) {
+    await setLead(state.lead, false);
+    preloadScenario(id); // background warm-up for smooth playback
+  }
+}
+
+async function selectProjectionConfig(id){
+  state.projectionConfig = id;
+  $("projection-config").value = id;
+  try {
+    projectionSummaryData = await getJSON(`/api/v1/projections/nowcast/${id}`);
+  } catch (e) {
+    if (e.statusCode === 503 && e.errorCode === "PROJECTION_UNAVAILABLE") {
+      projectionSummaryData = null;
+      renderProjectionStatus();
+      renderProjectionUnavailable();
+      renderProvenance();
+      return;
+    }
+    throw e;
+  }
+  state.route = null; state.selectedRoad = null; state.origin = null; state.dest = null;
+  renderProjectionStatus();
+  renderRoadPanel();
+  renderRoutePanel();
+  renderProvenance();
+  if (isProjectionMode()) {
+    state.lead = clampLead(state.lead);
+    await setLead(state.lead, false);
+    preloadProjection(id);
+  }
+}
+
+function renderProjectionUnavailable(){
+  const box = $("projection-status");
+  box.innerHTML = `
+    <div class="err" style="margin-top:6px">
+      <b>Projection unavailable</b><br>
+      A valid rainfall observation is not currently available for persistence projection.
+      This is an expected runtime state when the observation is missing, stale, or invalid.
+      Historical M5/M7 scenario mode remains available.
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:var(--muted)">
+      No synthetic or stale data has been substituted. The projection will become available
+      when a valid rainfall observation is ingested.
+    </div>`;
+  // Clear the map frame to avoid showing stale projection data.
+  frame = null;
+  depthCanvas = null;
+  extentCanvas = null;
+  renderMetrics();
+  draw();
+}
+function renderScenarioMeta(){
+  const box = $("scenarios"); box.innerHTML = "";
+  for (const s of scenarios) {
+    const el = document.createElement("div");
+    el.className = "scenario" + (s.scenario_id===state.scenario?" active":"");
+    el.dataset.id = s.scenario_id;
+    el.innerHTML = `<div class="name">${s.scenario_id} — ${s.display_name}</div>
+      <div class="meta">Rain ${s.rainfall_total_mm} mm/3h · ${s.rainfall_status}<br>Drain ${s.drainage_condition}</div>`;
+    el.onclick = ()=>selectScenario(s.scenario_id);
+    box.appendChild(el);
+  }
+}
+function renderProjectionStatus(){
+  const select = $("projection-config");
+  if (projectionConfigs.length && !select.options.length) {
+    select.innerHTML = projectionConfigs.map(cfg =>
+      `<option value="${cfg.config_id}">${cfg.display_name}</option>`).join("");
+  }
+  select.value = state.projectionConfig;
+  const box = $("projection-status");
+  if (!projectionSummaryData) { box.innerHTML = `<span class="muted">Projection bundle not loaded.</span>`; return; }
+  const obs = projectionSummaryData.observation || {};
+  box.innerHTML = `
+    <div class="kv">
+      <dt>Config</dt><dd>${projectionSummaryData.config.display_name}</dd>
+      <dt>Provider</dt><dd class="mono">${obs.source_provider_id||"—"}</dd>
+      <dt>Source</dt><dd>${obs.source_type||"—"}</dd>
+      <dt>Init time</dt><dd>${(obs.observation_time||"—").replace("T"," ").replace("+00:00","Z")}</dd>
+      <dt>Leads</dt><dd>${(projectionSummaryData.lead_times_minutes||[]).join(", ") || "0, 15, 30, 45, 60"}</dd>
+      <dt>Cache</dt><dd>${projectionSummaryData.cache_hit ? "hit" : "build"}</dd>
+      <dt>Total time</dt><dd>${fmt((projectionSummaryData.timings_ms||{}).total_projection,0)} ms</dd>
+    </div>`;
+}
+
+// ---------------------------------------------------------------- metrics
+function renderMetrics(){
+  const m = $("metrics"); const rm = frame ? frame.road_metrics : {};
+  const d = frame ? frame.drainage : {};
+  // reduce() rather than a variadic Math.max spread, which hits
+  // argument-count limits on large grids.
+  const currentMaxDepth = frame && Array.isArray(frame.depth)
+    ? frame.depth.reduce((mx, v) => v > mx ? v : mx, -Infinity)
+    : null;
+  const items = isProjectionMode()
+    ? [
+        ["Projected max depth", fmt(currentMaxDepth,3), "m"],
+        ["Projected lead", fmt(state.lead,0), "min"],
+        ["Impacted roads", fmt(rm.impacted_segments,0), "seg"],
+        ["Impassable roads", fmt(rm.impassable_segments,0), "seg"],
+        ["Drainage → surface (D2S)", fmt(d.exchange_D2S_cum_m3,1), "m³"],
+        ["Drainage outfall", fmt(d.outfall_cum_m3,1), "m³"],
+        ["Projection mode", "PERSISTENCE", "PROJ"],
+      ]
+    : [
+        ["Peak flood depth", fmt(scenarioResult.peak_depth_m,3), "m"],
+        ["Flooded area (max)", fmt((scenarioResult.max_flooded_area_m2||0)/1e6,3), "km²"],
+        ["Impacted roads", fmt(rm.impacted_segments,0), "seg"],
+        ["Impassable roads", fmt(rm.impassable_segments,0), "seg"],
+        ["Drainage → surface (D2S)", fmt(d.D2S_cum_m3,1), "m³"],
+        ["Drainage outfall", fmt(d.outfall_cum_m3,1), "m³"],
+        ["Surcharge", d.surcharged ? "ACTIVE" : "none", d.surcharged ? "" : ""],
+      ];
+  m.innerHTML = items.map(([k,v,u]) =>
+    `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div><div class="u">${u}</div></div>`).join("");
+}
+
+function renderInsights(){
+  const box = $("insights-label"); const ins = [];
+  if (!frame) { box.textContent="Loading…"; return; }
+  const rm = frame.road_metrics || {}, d = frame.drainage || {};
+  if (d.surcharged) ins.push("⚠ Drainage surcharge detected — ST1 head above vent ground.");
+  if (rm.impassable_segments > 0) ins.push(`⚠ ${rm.impassable_segments} road segment(s) impassable at this time.`);
+  if (frame.rainfall.current_intensity_mmh > 0) ins.push(`Rain forcing ${fmt(frame.rainfall.current_intensity_mmh,1)} mm/h (${frame.rainfall.status||"PROVISIONAL"}).`);
+  if (isProjectionMode()) ins.push("PERSISTENCE PROJECTION · NOT_REAL_TIME · NOT_VALIDATED FORECAST.");
+  if (state.route && state.route.status==="OK") {
+    const d2 = state.route.difference;
+    ins.push(`✓ Flood-aware route found: +${fmt(d2.additional_distance_m,0)} m, +${fmt(d2.additional_time_s/60,1)} min vs normal.`);
+  } else if (state.route && state.route.status==="NO_SAFE_ROUTE") {
+    ins.push("✕ No modelled route satisfies the selected passability policy at this time.");
+  }
+  box.textContent = ins.join("   ·   ");
+}
+
+// ---------------------------------------------------------------- road panel
+function renderRoadPanel(){
+  const box = $("road-panel");
+  if (!state.selectedRoad) { box.innerHTML = `<span class="muted">Click a road on the map.</span>`; return; }
+  const seg = roadsById.get(state.selectedRoad);
+  const imp = impactFor(state.selectedRoad);
+  const tl = state.selectedRoadTimeline;
+  box.innerHTML = `
+    <div style="font-weight:600;font-size:14px">ROAD ${seg.road_id}</div>
+    <div class="row" style="margin-top:4px"><span class="pill ${imp?imp.classification:""}">${imp?imp.classification:"—"}</span>
+      <span class="muted">${imp?imp.passability:""}</span></div>
+    <div class="kv" style="margin-top:6px">
+      <dt>Current depth</dt><dd>${imp?fmt(imp.max_depth_m,3)+" m":"—"}</dd>
+      <dt>Impacted length</dt><dd>${imp?fmt(imp.impacted_fraction*seg.length_m,0)+" / "+fmt(seg.length_m,0)+" m":"—"}</dd>
+      <dt>First impacted</dt><dd>${tl&&tl.first_impacted_lead_minutes!=null?hhmm(tl.first_impacted_lead_minutes):"—"}</dd>
+      <dt>Impassable from</dt><dd>${tl&&tl.first_impassable_lead_minutes!=null?hhmm(tl.first_impassable_lead_minutes):"—"}</dd>
+      <dt>Class / speed</dt><dd>${seg.road_class} · ${seg.baseline_speed_kmh} km/h</dd>
+      <dt>${isProjectionMode()?"Projection":"Scenario"}</dt><dd>${isProjectionMode()?state.projectionConfig:state.scenario}</dd>
+      <dt>Policy</dt><dd>${policy?policy.policy_id:"B13-DEMO-V1"}</dd>
+      <dt>Source</dt><dd class="mono">SYNTHETIC / DEMO DATA</dd>
+    </div>`;
+}
+async function selectRoad(rid){
+  state.selectedRoad = rid;
+  const path = isProjectionMode()
+    ? `/api/v1/projections/nowcast/${state.projectionConfig}/road-impact/${rid}`
+    : `/api/v1/scenarios/${state.scenario}/road-impact/${rid}`;
+  try {
+    state.selectedRoadTimeline = await getJSON(path);
+  } catch(e){
+    if (e.statusCode === 503 && e.errorCode === "PROJECTION_UNAVAILABLE") {
+      state.selectedRoadTimeline = null;
+    } else {
+      throw e;
+    }
+  }
+  renderRoadPanel(); draw();
+}
+
+// ---------------------------------------------------------------- route panel
+async function computeRoute(){
+  if (!state.origin || !state.dest) { renderRoutePanel(); return; }
+  try {
+    state.route = await (async()=>{
+      const path = isProjectionMode()
+        ? `/api/v1/projections/nowcast/${state.projectionConfig}/routes`
+        : `/api/v1/routes`;
+      const body = isProjectionMode()
+        ? {lead:state.lead, origin:state.origin, destination:state.dest, mode:state.routeMode}
+        : {scenario_id:state.scenario, lead:state.lead, origin:state.origin, destination:state.dest, mode:state.routeMode};
+      const r = await fetch(API+path, {method:"POST", headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body)});
+      if (!r.ok){
+        const j=await r.json().catch(()=>({}));
+        const err = new Error((j.error&&j.error.message)||r.statusText);
+        err.statusCode = r.status;
+        err.errorCode = (j.error&&j.error.code)||null;
+        throw err;
+      }
+      const data = await r.json();
+      return isProjectionMode() ? data.routing : data;
+    })();
+  } catch(e){
+    if (e.statusCode === 503 && e.errorCode === "PROJECTION_UNAVAILABLE") {
+      state.route = {error: "Projection unavailable: no valid rainfall observation for routing."};
+    } else {
+      state.route = {error: e.message};
+    }
+  }
+  renderRoutePanel(); renderInsights(); draw();
+}
+function renderRoutePanel(){
+  if (state.origin) $("inp-origin").value = state.origin.map(x=>x.toFixed(2)).join(",");
+  if (state.dest) $("inp-dest").value = state.dest.map(x=>x.toFixed(2)).join(",");
+  const box = $("route-panel");
+  const sel = (state.tool==="origin"||state.tool==="dest");
+  box.innerHTML = `<div class="row">
+    <span class="muted">Origin:</span><span>${state.origin?"set":"—"}</span>
+    <span class="muted" style="margin-left:8px">Dest:</span><span>${state.dest?"set":"—"}</span>
+  </div>`;
+  if (state.route && state.route.error) { box.innerHTML += `<div class="err">${state.route.error}</div>`; return; }
+  if (!state.route) { box.innerHTML += `<div class="muted">Click a route mode, then click the map twice (origin, destination).</div>`; return; }
+  if (state.route.status === "NO_SAFE_ROUTE") {
+    const title = isProjectionMode() ? "NO MODELLED ROUTE AVAILABLE" : "NO SAFE ROUTE AVAILABLE";
+    box.innerHTML += `<div class="err" style="margin-top:8px"><b>${title}</b><br>${state.route.explanation.summary}</div>`; return;
+  }
+  const b = state.route.baseline, f = state.route.flood_aware, diff = state.route.difference;
+  box.innerHTML += `
+    <div class="routecard"><div class="lbl">Normal route</div>
+      <div class="big">${fmt(b.distance_m/1000,1)} km · ${mmss(b.estimated_time_s)}</div></div>
+    <div class="routecard"><div class="lbl">Flood-aware route (${state.route.mode})</div>
+      <div class="big" style="color:var(--green)">${fmt(f.distance_m/1000,1)} km · ${mmss(f.estimated_time_s)}</div></div>
+    <div class="routecard"><div class="lbl">Change</div>
+      <div>+${fmt(diff.additional_distance_m,0)} m · +${fmt(diff.additional_time_s/60,1)} min</div>
+      <div class="lbl" style="margin-top:4px">Avoided</div>
+      <div>${diff.flooded_roads_avoided.length} impacted segment(s): ${diff.flooded_roads_avoided.join(", ")||"none"}</div>
+      <div class="explain">${state.route.explanation.summary}</div></div>`;
+}
+
+// ---------------------------------------------------------------- comparison
+async function renderComparison(){
+  try {
+    const c = await getJSON("/api/v1/comparison/s3s4");
+    const d = c.comparison.differences || {};
+    $("comparison").innerHTML = `<table>
+      <tr><td>Capture reduction</td><td class="num">${fmt(d.capture_reduction_m3,0)} m³</td></tr>
+      <tr><td>Outfall reduction</td><td class="num">${fmt(d.outfall_reduction_m3,0)} m³</td></tr>
+      <tr><td>D2S return</td><td class="num">+${fmt(d.additional_spill_m3,0)} m³</td></tr>
+      <tr><td>Surface storage Δ</td><td class="num">+${fmt(d.delta_surface_storage_change_m3,0)} m³</td></tr>
+      <tr><td>Surcharge Δ</td><td class="num">+${fmt(d.delta_max_surcharge_m,3)} m</td></tr>
+    </table>
+    <div class="explain">Global peak-depth change is small because max depth is dominated by basin
+      terrain/rainfall; blockage effects appear in drainage return, outfall and surface storage.</div>`;
+  } catch(e){ $("comparison").innerHTML = `<span class="muted">S3/S4 comparison unavailable.</span>`; }
+}
+
+// ---------------------------------------------------------------- provenance
+function renderProvenance(){
+  if (isProjectionMode() && projectionSummaryData && frame && frame.projection) {
+    const obs = projectionSummaryData.observation || {};
+    $("provenance").innerHTML = `
+      <dt>Projection config</dt><dd class="mono">${state.projectionConfig}</dd>
+      <dt>Config fingerprint</dt><dd class="mono">${frame.projection.config_fingerprint||"—"}</dd>
+      <dt>Projection fingerprint</dt><dd class="mono">${frame.projection.projection_fingerprint||"—"}</dd>
+      <dt>Observation fingerprint</dt><dd class="mono">${frame.projection.observation_fingerprint||"—"}</dd>
+      <dt>Nowcast fingerprint</dt><dd class="mono">${frame.projection.nowcast_fingerprint||"—"}</dd>
+      <dt>Model version</dt><dd class="mono">${frame.projection.model_version||"—"} / ${frame.projection.engine_version||"—"}</dd>
+      <dt>Rainfall source</dt><dd>${frame.projection.source_type||"—"} / ${frame.projection.source_provider_id||"—"}</dd>
+      <dt>Nowcast method</dt><dd class="mono">${frame.rainfall.nowcast_method||"—"}</dd>
+      <dt>Projection status</dt><dd>PERSISTENCE PROJECTION · NOT_REAL_TIME · NOT_VALIDATED FORECAST</dd>
+      <dt>Road source</dt><dd>SYNTHETIC / DEMO DATA / NOT REAL ROAD GEOMETRY</dd>
+      <dt>B13 policy</dt><dd>${policy?policy.policy_id:"—"} · ${policy?policy.status:""}</dd>`;
+    return;
+  }
+  const prof = scenarioMeta.rainfall_profile || {};
+  $("provenance").innerHTML = `
+    <dt>Scenario fingerprint</dt><dd class="mono">${scenarioMeta.scenario_fingerprint||"—"}</dd>
+    <dt>Run ID</dt><dd class="mono">${scenarioResult.run_id||"—"}</dd>
+    <dt>Model version</dt><dd class="mono">${scenarioResult.model_version||"—"} / ${scenarioResult.engine_version||"—"}</dd>
+    <dt>Rainfall source</dt><dd>${prof.source||"—"}</dd>
+    <dt>Rainfall status</dt><dd>${scenarioMeta.rainfall_status||"—"}</dd>
+    <dt>DEM source</dt><dd>SYNTHETIC DSM fixture</dd>
+    <dt>Road source</dt><dd>SYNTHETIC / DEMO DATA / NOT REAL ROAD GEOMETRY</dd>
+    <dt>Drainage source</dt><dd>SYNTHETIC SWMM INP</dd>
+    <dt>B13 policy</dt><dd>${policy?policy.policy_id:"—"} · ${policy?policy.status:""}</dd>
+    <dt>Policy fingerprint</dt><dd class="mono">${policy?policy.fingerprint:"—"}</dd>
+    <dt>D-016 status</dt><dd>${scenarioMeta.d016_status||"—"} — ${scenarioMeta.d016_human_review||"—"}</dd>`;
+}
+
+// ---------------------------------------------------------------- interactions
+canvas.addEventListener("wheel", (e)=>{
+  e.preventDefault();
+  const before = s2w(e.offsetX, e.offsetY);
+  const f = e.deltaY < 0 ? 1.15 : 1/1.15;
+  view.scale = Math.max(0.02, Math.min(20, view.scale*f));
+  const after = w2s(before[0], before[1]);
+  view.ox += e.offsetX - after[0]; view.oy += e.offsetY - after[1];
+  draw();
+});
+let dragging=false, lastX=0, lastY=0;
+canvas.addEventListener("mousedown", (e)=>{ dragging=true; lastX=e.offsetX; lastY=e.offsetY; canvas.classList.add("dragging"); });
+window.addEventListener("mouseup", ()=>{ dragging=false; canvas.classList.remove("dragging"); });
+canvas.addEventListener("mousemove", (e)=>{
+  if (dragging){ view.ox += e.offsetX-lastX; view.oy += e.offsetY-lastY; lastX=e.offsetX; lastY=e.offsetY; draw(); }
+  else {
+    // hover tooltip: depth readout + nearest road
+    const [wx,wy] = s2w(e.offsetX, e.offsetY);
+    const [r,c] = worldToCell(wx,wy);
+    const tt = $("tooltip");
+    if (frame && r>=0 && c>=0){
+      const d = frame.depth[r*N+c];
+      let html = `depth ${fmt(d,3)} m`;
+      const rid = hitRoad(wx,wy);
+      if (rid) html += `<br>${rid}`;
+      tt.innerHTML = html; tt.style.display="block";
+      tt.style.left = (e.offsetX+12)+"px"; tt.style.top = (e.offsetY+12)+"px";
+    } else tt.style.display="none";
+  }
+});
+canvas.addEventListener("mouseleave", ()=>{ $("tooltip").style.display="none"; });
+canvas.addEventListener("click", (e)=>{
+  const [wx,wy] = s2w(e.offsetX, e.offsetY);
+  if (state.tool === "origin"){ state.origin=[wx,wy]; state.tool="select"; updateToolButtons(); renderRoutePanel(); computeRoute(); draw(); return; }
+  if (state.tool === "dest"){ state.dest=[wx,wy]; state.tool="select"; updateToolButtons(); renderRoutePanel(); computeRoute(); draw(); return; }
+  const rid = hitRoad(wx,wy);
+  if (rid) selectRoad(rid); else { state.selectedRoad=null; state.selectedRoadTimeline=null; renderRoadPanel(); draw(); }
+});
+
+function _parsePoint(str){
+  if (typeof str !== "string") return null;
+  const parts = str.trim().split(",");
+  if (parts.length !== 2) return null;
+  const s0 = parts[0].trim(), s1 = parts[1].trim();
+  if (!s0 || !s1) return null;
+  const x = Number(s0), y = Number(s1);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (x < 300000 || x > 304020 || y < 2500000 || y > 2504020) return null;
+  return [x, y];
+}
+$("inp-origin").addEventListener("change", (e)=>{
+  const p = _parsePoint(e.target.value);
+  if (p) { state.origin=p; renderRoutePanel(); computeRoute(); draw(); }
+});
+$("inp-dest").addEventListener("change", (e)=>{
+  const p = _parsePoint(e.target.value);
+  if (p) { state.dest=p; renderRoutePanel(); computeRoute(); draw(); }
+});
+function hitRoad(wx,wy){
+  let best=null, bestD=1e9;
+  for (const r of roads){
+    for (let i=0;i<r.geometry.length-1;i++){
+      const [ax,ay]=r.geometry[i], [bx,by]=r.geometry[i+1];
+      const d = distToSeg(wx,wy,ax,ay,bx,by);
+      if (d < bestD){ bestD=d; best=r.road_id; }
+    }
+  }
+  const pxThresh = 6/view.scale;
+  return bestD <= pxThresh ? best : null;
+}
+function distToSeg(px,py,ax,ay,bx,by){
+  const dx=bx-ax, dy=by-ay; const L2=dx*dx+dy*dy;
+  let t = L2? ((px-ax)*dx+(py-ay)*dy)/L2 : 0; t=Math.max(0,Math.min(1,t));
+  const cx=ax+t*dx, cy=ay+t*dy; return Math.hypot(px-cx,py-cy);
+}
+
+// ---------------------------------------------------------------- timeline
+function updateToolButtons(){
+  $("tool-origin").classList.toggle("on", state.tool==="origin");
+  $("tool-dest").classList.toggle("on", state.tool==="dest");
+}
+$("tool-origin").onclick = ()=>{ state.tool = state.tool==="origin"?"select":"origin"; updateToolButtons(); };
+$("tool-dest").onclick = ()=>{ state.tool = state.tool==="dest"?"select":"dest"; updateToolButtons(); };
+$("route-mode").onchange = (e)=>{ state.routeMode=e.target.value; if(state.origin&&state.dest) computeRoute(); };
+$("view-mode").onchange = async (e)=>{
+  state.viewMode = e.target.value;
+  updateLeadControl();
+  frameCache.clear();
+  if (isProjectionMode()) {
+    try {
+      await selectProjectionConfig(state.projectionConfig);
+    } catch (e2) {
+      if (e2.statusCode === 503 && e2.errorCode === "PROJECTION_UNAVAILABLE") {
+        renderProjectionUnavailable();
+      } else { throw e2; }
+    }
+  } else {
+    await selectScenario(state.scenario);
+  }
+};
+$("projection-config").onchange = async (e)=>{
+  state.projectionConfig = e.target.value;
+  frameCache.clear();
+  try {
+    await selectProjectionConfig(state.projectionConfig);
+  } catch (e2) {
+    if (e2.statusCode === 503 && e2.errorCode === "PROJECTION_UNAVAILABLE") {
+      renderProjectionUnavailable();
+    } else { throw e2; }
+  }
+};
+
+const speeds = [0.5,1,2,4];
+(function(){ const b=$("speed"); b.innerHTML=""; for(const s of speeds){ const el=document.createElement("button"); el.textContent=s+"×"; el.className = s===state.speed?"on":""; el.onclick=()=>{ state.speed=s; [...b.children].forEach(c=>c.classList.toggle("on",c.textContent===s+"×")); }; b.appendChild(el);} })();
+
+let playTimer=null;
+function play(){ if(playTimer) return; state.playing=true; $("btn-play").textContent="⏸"; $("btn-play").classList.add("on");
+  playTimer = setInterval(()=>{ let n=state.lead+5; if(n>180) n=0; setLead(n); }, Math.round(600/state.speed)); }
+function pause(){ if(playTimer){clearInterval(playTimer);playTimer=null;} state.playing=false; $("btn-play").textContent="▶"; $("btn-play").classList.remove("on"); }
+$("btn-play").onclick = ()=> state.playing?pause():play();
+$("btn-restart").onclick = ()=>{ pause(); setLead(0); };
+$("btn-end").onclick = ()=>{ pause(); setLead(180); };
+$("btn-step-back").onclick = ()=>{ pause(); setLead(Math.max(0,state.lead-5)); };
+$("btn-step-fwd").onclick = ()=>{ pause(); setLead(Math.min(180,state.lead+5)); };
+$("lead-slider").addEventListener("input", (e)=>{ pause(); setLead(Number(e.target.value)); });
+
+// layer toggles
+document.querySelectorAll("[data-layer]").forEach(cb=>{
+  cb.onchange = ()=>{ state.layers[cb.dataset.layer]=cb.checked;
+    if (cb.dataset.layer==="rainfall" && cb.checked && !rainCanvas) loadRain(state.scenario, state.lead);
+    draw(); };
+});
+
+window.addEventListener("resize", ()=>{ resize(); draw(); });
+
+// ---------------------------------------------------------------- init
+async function loadRainfallStatus(){
+  try {
+    const [rain, nc, ncs] = await Promise.all([
+      getJSON("/api/v1/rainfall/status"),
+      getJSON("/api/v1/nowcast/latest"),
+      getJSON("/api/v1/nowcast/status"),
+    ]);
+    const box = $("rainfall-status");
+    const src = rain.source_type;
+    const freshness = rain.quality ? rain.quality.freshness : "—";
+    const method = ncs.method || "—";
+    const uncertainty = ncs.uncertainty || "NOT PROVIDED";
+    const verify = ncs.verification ? ncs.verification.status : "NOT_EVALUATED";
+    const providerHealth = rain.health ? rain.health.status : "—";
+    box.innerHTML = `
+      <div class="kv">
+        <dt>Source</dt><dd>${src}</dd>
+        <dt>Provider</dt><dd class="mono">${rain.provider_id}</dd>
+        <dt>Health</dt><dd>${providerHealth}</dd>
+        <dt>Freshness</dt><dd>${freshness}</dd>
+        <dt>Nowcast method</dt><dd class="mono">${method}</dd>
+        <dt>Lead times</dt><dd>${ncs.lead_times_minutes ? ncs.lead_times_minutes.join(", ") : "0–60 min"}</dd>
+        <dt>Uncertainty</dt><dd>${uncertainty}</dd>
+        <dt>Verification</dt><dd>${verify}</dd>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:var(--amber)">⚠ PERSISTENCE BASELINE · PERSISTENCE PROJECTION · NOT_REAL_TIME · NOT_VALIDATED FORECAST</div>
+    `;
+  } catch(e){
+    $("rainfall-status").innerHTML = `<div class="err" style="font-size:11px">Rainfall data unavailable: ${e.message}</div>`;
+  }
+}
+(async function init(){
+  try {
+    await getJSON("/api/v1/version");
+    const [sc, rd, pol, dp, projStatus] = await Promise.all([
+      getJSON("/api/v1/scenarios"),
+      getJSON("/api/v1/roads"),
+      getJSON("/api/v1/policies"),
+      getJSON("/api/v1/drainage/points"),
+      getJSON("/api/v1/projections/nowcast/status"),
+    ]);
+    scenarios = sc.scenarios; roads = rd.segments; networkMeta = rd;
+    roads.forEach(r=>roadsById.set(r.road_id, r));
+    policy = pol.policies[0]; drainPts = dp;
+    projectionStatusData = projStatus; projectionConfigs = projStatus.configs || [];
+    if (projectionConfigs.length) state.projectionConfig = projectionConfigs[0].config_id;
+    resize();
+    updateLeadControl();
+    await selectScenario(state.scenario);
+    try {
+      await selectProjectionConfig(state.projectionConfig);
+    } catch (e2) {
+      if (e2.statusCode === 503 && e2.errorCode === "PROJECTION_UNAVAILABLE") {
+        projectionSummaryData = null;
+      } else { throw e2; }
+    }
+    loadRainfallStatus();
+  } catch(e){
+    document.body.insertAdjacentHTML("afterbegin", `<div class="err" style="position:fixed;top:60px;left:10px;z-index:9">Failed to load: ${e.message}</div>`);
+  }
+})();
+</script>
+</body>
+</html>
