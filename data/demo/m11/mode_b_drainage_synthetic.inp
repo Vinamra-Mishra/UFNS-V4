@@ -1,0 +1,40 @@
+[TITLE]
+UFNS M3 synthetic drainage fixture (exact-exchange) - clean C1 D=0.3 - SYNTHETIC/ASSUMED, represents no real place
+[OPTIONS]
+FLOW_UNITS           CMS
+FLOW_ROUTING         DYNWAVE
+START_DATE           08/21/2026
+START_TIME           00:00:00
+END_DATE             08/21/2026
+END_TIME             06:00:00
+REPORT_STEP          00:05:00
+DRY_STEP             00:01:00
+WET_STEP             00:01:00
+ROUTING_STEP         1.0
+ALLOW_PONDING        NO
+[STORAGE]
+;;Name  Elev       MaxDepth  InitDepth  Shape    Curve
+ST1     3.403475046157837    5.0       0.0       TABULAR  area_st1
+V1      2.403475046157837     5.0       0.0       TABULAR  area_v1
+[CURVES]
+;;Curve    Type     X     Y
+area_st1  STORAGE  0.0   4.0
+area_st1           5.0   4.0
+area_v1   STORAGE  0.0   1.0
+area_v1            5.0   1.0
+[CONDUITS]
+;;Name  From  To   Length     Manning  InOffset  OutOffset  InitFlow  MaxFlow
+C1      ST1   V1   100.0     0.013   0         0          0         0
+C2      V1    O1   5.0      0.013   0         0          0         0
+[XSECTIONS]
+;;Link  Shape      Geom1   Geom2  Geom3  Geom4  Barrels
+C1      CIRCULAR   0.3     0      0      0      1
+C2      CIRCULAR   0.3     0      0      0      1
+[OUTFALLS]
+;;Name  Elev       Type  Stage/Gated
+O1      2.353475046157836     FREE  NO
+[REPORT]
+INPUT YES
+CONTROLS YES
+NODES ALL
+LINKS ALL
