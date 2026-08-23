@@ -771,6 +771,15 @@ async def _http_exception_handler(request, exc: HTTPException):
     )
 
 
+from fastapi.exceptions import RequestValidationError
+@app.exception_handler(RequestValidationError)
+async def _validation_error_handler(request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"error": {"code": "VALIDATION_ERROR", "message": str(exc)}},
+    )
+
+
 @app.exception_handler(store.StoreError)
 async def _store_error_handler(request, exc: store.StoreError):
     return JSONResponse(

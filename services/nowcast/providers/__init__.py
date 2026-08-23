@@ -96,6 +96,12 @@ class RainfallObservation:
             raise ValueError("valid_to must be timezone-aware")
         if self.valid_to <= self.valid_from:
             raise ValueError("valid_to must be strictly after valid_from")
+        if self.metadata is not None:
+            import json
+            try:
+                json.dumps(self.metadata)
+            except (TypeError, ValueError) as e:
+                raise ValueError("metadata must be JSON-serializable") from e
 
     def fingerprint(self) -> str:
         """Deterministic fingerprint of this observation.
@@ -115,6 +121,9 @@ class RainfallObservation:
             "valid_to": self.valid_to.isoformat(),
             "source_type": self.source_type.value,
             "source_provider_id": self.source_provider_id,
+            "source_name": self.source_name,
+            "quality_flags": list(self.quality_flags),
+            "metadata": self.metadata,
             "spatial_reference": self.spatial_reference,
             "spatial_resolution_m": self.spatial_resolution_m,
             "width": self.width,

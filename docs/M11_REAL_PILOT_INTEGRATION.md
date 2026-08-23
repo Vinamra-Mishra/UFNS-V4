@@ -264,9 +264,9 @@ real drainage hydraulic capacity. Health exposes
 
 The real WB AMRUT drainage data lacks diameter, invert elevations, Manning
 roughness, and capacity. Therefore M11 **does NOT claim** "real drainage
-hydraulic simulation". It **does claim** "real drainage geometry integrated"
-and "real terrain integrated through the coupled model" — both with execution
-evidence (gates M11-01, M11-02, M11-06).
+hydraulic simulation" or "real drainage geometry integrated through the coupled model".
+It **does claim** "real terrain integrated through the coupled model" — with execution
+evidence (gates M11-01, M11-06).
 
 - Hydraulic parameters in MODE B are SYNTHETIC/ASSUMED, not real, not validated against the pilot network.
 - Vertical datum of the real DEM is UNVERIFIED; the synthetic fixture datum is anchored to the real ROI basin for coupling only.

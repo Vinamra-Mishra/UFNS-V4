@@ -237,7 +237,9 @@ class CoupledSpike:
             prev_d2s_rate = 0.0
             prev_ext_rate = 0.0  # external inflow active during the completed stride
             rain_ms = rain_mmh / 3600000.0
+            last_i = -1
             for i, _ in enumerate(sim):
+                last_i = i
                 if i >= n_steps + 1:
                     break
                 t = (i + 1) * dt  # SWMM state is at t_{i+1} after stride i
@@ -307,6 +309,9 @@ class CoupledSpike:
                 )
                 if not math.isfinite(s2d) or not math.isfinite(d2s):
                     raise CouplingError("non-finite exchange volume")
+
+            if last_i < n_steps:
+                raise CouplingError(f"SWMM simulation ended prematurely at stride {last_i}, expected at least {n_steps}")
 
             led.flow_routing_error_pct = float(sim.flow_routing_error)
             led.S_s1 = self.surface.surface_storage_m3()

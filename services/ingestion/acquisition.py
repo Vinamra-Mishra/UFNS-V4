@@ -55,8 +55,6 @@ def attempt_download(
         with urlopen(url, timeout=timeout_s) as response:
             body = response.read()
     except Exception as exc:  # noqa: BLE001
-        if dest.exists():
-            dest.unlink()  # never leave a partial/empty artifact behind
         return AcquisitionAttempt(
             source_name=source_name,
             url=url,
@@ -66,7 +64,9 @@ def attempt_download(
             consequence=consequence,
         )
 
-    dest.write_bytes(body)
+    tmp = dest.with_name(dest.name + ".tmp")
+    tmp.write_bytes(body)
+    tmp.replace(dest)
     return AcquisitionAttempt(
         source_name=source_name,
         url=url,

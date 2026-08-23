@@ -172,8 +172,8 @@ def validate_observation(
     # --- Freshness ---
     age_minutes = (now - observation.observation_time).total_seconds() / 60.0
     if age_minutes < 0:
-        freshness = DataFreshness.FRESH
-        warnings.append(f"observation is in the future by {-age_minutes:.1f} minutes")
+        freshness = DataFreshness.INVALID
+        errors.append(f"observation is in the future by {-age_minutes:.1f} minutes")
     elif age_minutes <= config.freshness_threshold_minutes:
         freshness = DataFreshness.FRESH
     elif age_minutes <= config.stale_threshold_minutes:

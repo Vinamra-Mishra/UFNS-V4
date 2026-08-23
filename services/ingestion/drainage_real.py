@@ -462,6 +462,9 @@ EXPECTED_WB_AMRUT_DRAIN_ATTRIBUTES = [
 ]
 
 
+import functools
+
+@functools.lru_cache(maxsize=4)
 def _read_geoparquet(
     source_path: Path,
 ) -> tuple[Any, str | None, str | None, list[str]]:
@@ -485,7 +488,8 @@ def _read_geoparquet(
     crs_wkt: str | None = None
     if geom_col is not None:
         col_meta = geo_meta.get("columns", {}).get(geom_col, {})
-        crs_wkt = col_meta.get("crs")
+        crs = col_meta.get("crs")
+        crs_wkt = crs if isinstance(crs, str) else json.dumps(crs) if crs else None
     if geom_col is None:
         for candidate in ("geometry", "geom", "wkb_geometry"):
             if candidate in df.columns:

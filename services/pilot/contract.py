@@ -133,7 +133,7 @@ def _freeze_attributes(
 def build_real_drainage_contract(
     dataset: str,
     *,
-    missing: tuple[str, ...] = REQUIRED_HYDRAULIC_ATTRIBUTES,
+    missing: tuple[str, ...] | None = None,
     unresolved: tuple[str, ...] = (),
     derived: tuple[str, ...] = (),
     present: tuple[str, ...] = (),
@@ -146,6 +146,11 @@ def build_real_drainage_contract(
     Depth, Dr_Slope, DPS_CAP) must be passed explicitly as ``unresolved``;
     they are NEVER auto-converted to hydraulic parameters.
     """
+    if missing is None:
+        missing = tuple(
+            a for a in REQUIRED_HYDRAULIC_ATTRIBUTES
+            if a not in unresolved and a not in derived and a not in present
+        )
     status: dict[str, AttributeReadiness] = {}
     for name in REQUIRED_HYDRAULIC_ATTRIBUTES:
         if name in present:

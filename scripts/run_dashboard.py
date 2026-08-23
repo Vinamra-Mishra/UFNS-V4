@@ -23,7 +23,7 @@ from apps.api.app import app  # noqa: E402
 
 
 def main() -> None:
-    host = os.environ.get("UFNS_API_HOST", "0.0.0.0")
+    host = os.environ.get("UFNS_API_HOST", "127.0.0.1")
     port = int(os.environ.get("UFNS_API_PORT", "8000"))
     uvicorn.run(app, host=host, port=port, log_level="info")
 

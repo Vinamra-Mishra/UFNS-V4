@@ -46,7 +46,32 @@ class ProjectionConfigRecord:
     seed: int
     status: str
     labels: tuple[str, ...]
-    fingerprint: str
+    fingerprint: str = ""
+
+    def __post_init__(self) -> None:
+        payload = {
+            "config_id": self.config_id,
+            "drainage_condition": self.drainage_condition.condition_id,
+            "drainage_fingerprint": self.drainage_condition.inp_fingerprint,
+            "duration_minutes": self.duration_minutes,
+            "lead_times_minutes": list(self.lead_times_minutes),
+            "rainfall_interval_minutes": self.rainfall_interval_minutes,
+            "snapshot_interval_minutes": self.snapshot_interval_minutes,
+            "coupling_timestep_s": self.coupling_timestep_s,
+            "extent_threshold_m": self.extent_threshold_m,
+            "manning_n": self.manning_n,
+            "horton_f0_mmh": self.horton_f0_mmh,
+            "horton_fmin_mmh": self.horton_fmin_mmh,
+            "horton_k_s1": self.horton_k_s1,
+            "microstore_m": self.microstore_m,
+            "cd": self.cd,
+            "ao_per_inlet": self.ao_per_inlet,
+            "seed": self.seed,
+            "model_version": MODEL_VERSION,
+        }
+        canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        fp = hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
+        object.__setattr__(self, "fingerprint", fp)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -73,31 +98,6 @@ class ProjectionConfigRecord:
             "labels": list(self.labels),
             "fingerprint": self.fingerprint,
         }
-
-
-def _fingerprint(config_id: str, drainage: DrainageCondition) -> str:
-    payload = {
-        "config_id": config_id,
-        "drainage_condition": drainage.condition_id,
-        "drainage_fingerprint": drainage.inp_fingerprint,
-        "duration_minutes": VALID_LEADS[-1],
-        "lead_times_minutes": list(VALID_LEADS),
-        "rainfall_interval_minutes": RAINFALL_INTERVAL_MINUTES,
-        "snapshot_interval_minutes": RAINFALL_INTERVAL_MINUTES,
-        "coupling_timestep_s": M5_DT_C,
-        "extent_threshold_m": M5_EXTENT_THRESHOLD_M,
-        "manning_n": M5_M_ANNING,
-        "horton_f0_mmh": M5_HORTON_F0_MMH,
-        "horton_fmin_mmh": M5_HORTON_FMIN_MMH,
-        "horton_k_s1": M5_HORTON_K_S1,
-        "microstore_m": M5_MICROSTORE_M,
-        "cd": M5_CD,
-        "ao_per_inlet": M5_AO_PER_INLET,
-        "seed": M5_SEED,
-        "model_version": MODEL_VERSION,
-    }
-    canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canon.encode("utf-8")).hexdigest()[:16]
 
 
 PROJECTION_CONFIGS: dict[str, ProjectionConfigRecord] = {
@@ -132,7 +132,6 @@ PROJECTION_CONFIGS: dict[str, ProjectionConfigRecord] = {
             "NOT_REAL_TIME",
             "NOT_VALIDATED_FORECAST",
         ),
-        fingerprint=_fingerprint("P_NORMAL", DRAINAGE_CONDITIONS["D_NORMAL"]),
     ),
     "P_BLOCKED": ProjectionConfigRecord(
         config_id="P_BLOCKED",
@@ -165,7 +164,6 @@ PROJECTION_CONFIGS: dict[str, ProjectionConfigRecord] = {
             "NOT_REAL_TIME",
             "NOT_VALIDATED_FORECAST",
         ),
-        fingerprint=_fingerprint("P_BLOCKED", DRAINAGE_CONDITIONS["D_BLOCKED"]),
     ),
 }
 

@@ -167,6 +167,7 @@ class DEMNormalizationResult:
     nodata_cells: int = 0
     total_cells: int = 0
     resampling: str = DEM_RESAMPLING
+    output_crs: str = ""
     validation_errors: tuple[str, ...] = ()
     validation_warnings: tuple[str, ...] = ()
 
@@ -394,9 +395,11 @@ def ingest_dem(
 
             bounds = tuple(src.bounds)
             west, south, east, north = bounds
-            if not (west < east and south < north and -180.0 <= west <= 180.0
-                    and -180.0 <= east <= 180.0 and -90.0 <= south <= 90.0 and -90.0 <= north <= 90.0):
-                errors.append(f"implausible spatial bounds: {bounds}")
+            if west >= east or south >= north:
+                errors.append(f"invalid bounding box (zero/negative area): {bounds}")
+            if src.crs and src.crs.is_geographic:
+                if not (-180.0 <= west <= 180.0 and -180.0 <= east <= 180.0 and -90.0 <= south <= 90.0 and -90.0 <= north <= 90.0):
+                    errors.append(f"implausible geographic bounds: {bounds}")
 
             data = src.read(1)
 
@@ -664,6 +667,7 @@ def normalize_dem(
         nodata_cells=nodata_cells,
         total_cells=total_cells,
         resampling=DEM_RESAMPLING,
+        output_crs=ingestion.output_crs,
         validation_warnings=tuple(warnings),
     )
 

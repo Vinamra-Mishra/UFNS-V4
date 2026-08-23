@@ -72,7 +72,7 @@ def alternating_block_hyetograph(total_mm: float, duration_min: int, interval_mi
     order[mid] = int(np.argmax(increments))
     idx = 1
     left, right = mid - 1, mid + 1
-    remaining = sorted(np.argsort(increments)[::-1][1:], reverse=True)
+    remaining = np.argsort(increments)[::-1][1:]
     for k in remaining:
         if left >= 0 and right < n:
             if idx % 2 == 1:
